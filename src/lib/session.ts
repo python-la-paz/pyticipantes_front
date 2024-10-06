@@ -11,5 +11,5 @@ export async function getCurrentUser() {
     //         },
     //     }
     // }
-    return session?.user
+    return session
 }

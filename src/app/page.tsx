@@ -1,3 +1,10 @@
+import React from 'react';
+import MenuAppBar from './components/nav';
+
 export default function Page() {
-    return <h1>Hello, Next.js!</h1>
+    return (
+        <div>
+            <h1>Page</h1>
+        </div>
+    )
 }
