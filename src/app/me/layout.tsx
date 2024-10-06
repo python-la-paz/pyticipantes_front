@@ -1,4 +1,7 @@
 import { getCurrentUser } from "@/lib/session"
+import { Container } from "@mui/material"
+import Box from "@mui/material/Box"
+import Head from "next/head"
 import { notFound } from "next/navigation"
 
 export default async function MeLayout({ children }: { children: React.ReactNode }) {
@@ -7,9 +10,19 @@ export default async function MeLayout({ children }: { children: React.ReactNode
         return notFound()
     }
     return (
-        <div>
-            <h1>Usuario: {session.user.name}</h1>
-            {children}
-        </div>
+        <>
+            <Head>
+                <title>Mi Perfil</title>
+                <meta name="description" content="Perfil de Usuario" />
+            </Head>
+            <Container fixed>
+                <Box sx={{
+                    height: '100vh',
+                    margin: 'auto', padding: '10px'
+                }} >
+                    {children}
+                </Box>
+            </Container>
+        </>
     )
 }

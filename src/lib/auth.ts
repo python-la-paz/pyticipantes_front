@@ -24,14 +24,12 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, account }: any) {
             if (account) {
                 const accessToken = await fetchLoginAPI(account.access_token)
-                console.log(accessToken)
                 token.accessToken = accessToken
             }
             return token
         },
         async session({ session, token, user }: any) {
             session.accessToken = token.accessToken
-            console.log(token.accessToken)
             return session
         }
     }

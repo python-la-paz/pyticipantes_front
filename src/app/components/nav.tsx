@@ -17,7 +17,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-export default function MenuAppBar() {
+export default function MenuAppBar({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
 
     const [auth, setAuth] = useState(true);
@@ -92,13 +92,13 @@ export default function MenuAppBar() {
             open={isMenuOpen}
             onClose={handleMenuClose}>
             {session ? (
-                <>
+                <div>
                     {renderLogged}
-                </>
+                </div>
             ) : (
-                <>
+                <div>
                     {renderNotLogged}
-                </>
+                </div>
             )}
         </Menu>
     );
@@ -110,13 +110,13 @@ export default function MenuAppBar() {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}>
             {session ? (
-                <>
+                <div>
                     {renderLogged}
-                </>
+                </div>
             ) : (
-                <>
+                <div>
                     {renderNotLogged}
-                </>
+                </div>
             )}
         </Menu>
     );
@@ -161,6 +161,7 @@ export default function MenuAppBar() {
                     {renderMenu}
                 </Toolbar>
             </AppBar>
+            {children}
         </Box>
     );
 }
