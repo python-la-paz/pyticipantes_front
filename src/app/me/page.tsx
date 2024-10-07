@@ -1,7 +1,7 @@
 "use client"
 import { accessTokenState } from "@/atoms";
-import { mePageQuery } from "@/atoms/selectors";
-import { UserProps } from "@/const";
+import { genderQuery, mePageQuery } from "@/atoms/selectors";
+import { GenderProps, UserProps } from "@/const";
 import { updateMe } from "@/lib/http/user";
 import { Avatar, Button, FormControl, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -17,6 +17,8 @@ import { useRecoilState, useRecoilValueLoadable } from "recoil";
 
 function MeInfo(props: any) {
     const meDetailsLoadable = useRecoilValueLoadable(mePageQuery);
+    const genderDetailsLoadable = useRecoilValueLoadable(genderQuery);
+    const [genders, setGenders] = useState<GenderProps[]>([]);
     const handleGender = (event: SelectChangeEvent) => {
         props.setGender(event.target.value as string);
     };
@@ -25,6 +27,11 @@ function MeInfo(props: any) {
             props.setUser(meDetailsLoadable.contents.content);
         }
     }, [meDetailsLoadable]);
+    useEffect(() => {
+        if (genderDetailsLoadable.state === 'hasValue') {
+            setGenders(genderDetailsLoadable.contents.content as GenderProps[]);
+        }
+    }, [genderDetailsLoadable]);
     switch (meDetailsLoadable.state) {
         case "hasValue":
             const data = meDetailsLoadable.contents.content;
@@ -60,10 +67,11 @@ function MeInfo(props: any) {
                                         value={props.user.gender}
                                         onChange={handleGender}
                                     >
-                                        <MenuItem value={"M"}>Másculino</MenuItem>
-                                        <MenuItem value={"F"}>Fémenino</MenuItem>
-                                        <MenuItem value={"NB"}>No Binario</MenuItem>
-                                        <MenuItem value={"N/A"}>Prefiero no decirlo</MenuItem>
+                                        {genders.map((option) => (
+                                            <MenuItem key={option._id} value={option._id}>
+                                                {option.name}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>)

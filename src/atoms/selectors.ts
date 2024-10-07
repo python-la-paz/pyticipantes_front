@@ -1,6 +1,6 @@
 import { accessTokenState } from "@/atoms";
-import { UserProps } from "@/const";
-import { fetchMe } from "@/lib/http/user";
+import { GenderProps, UserProps } from "@/const";
+import { fetchGender, fetchMe } from "@/lib/http/user";
 import { selector } from "recoil";
 
 export const mePageQuery = selector({
@@ -15,5 +15,19 @@ export const mePageQuery = selector({
             return response;
         }
         return { content: {} as UserProps };
+    },
+});
+export const genderQuery = selector({
+    key: "genderQuery",
+    get: async ({ get }) => {
+        const id = get(accessTokenState);
+        if (id !== "") {
+            const response = await fetchGender(id);
+            if (response.error) {
+                throw response.error;
+            }
+            return response;
+        }
+        return { content: [] as GenderProps[]  };
     },
 });

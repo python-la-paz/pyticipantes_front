@@ -16,3 +16,7 @@ export type UserProps = {
     phone: string | null;
     data_complete: boolean;
 };
+export type GenderProps = {
+    _id: string;
+    name: string;
+};
