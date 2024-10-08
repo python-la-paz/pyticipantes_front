@@ -8,3 +8,7 @@ export const accessTokenState = atom({
     key: 'AccessTokenState',
     default: "",
 });
+export const eventPageState = atom({
+    key: "EventPageState",
+    default: { page: 1, size: 1000 },
+});

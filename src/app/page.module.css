@@ -163,3 +163,17 @@ a.secondary {
     filter: invert();
   }
 }
+
+.itemList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 256px);
+  gap: 2rem;
+  justify-content: start;
+}
+
+@media (max-width: 600px) {
+
+  .itemList {
+    justify-content: center;
+  }
+}
