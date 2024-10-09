@@ -58,3 +58,10 @@ export type EventRegisterProps = {
     additional_info?: string[];
     _id: string;
 };
+
+export type PageProps = {
+    slug: string;
+    title: string;
+    html: string;
+    _id: string;
+};

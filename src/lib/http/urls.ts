@@ -6,5 +6,6 @@ class URLS {
     static readonly EVENTS = '/public/event'
     static readonly EVENT = '/public/event/{id}'
     static readonly EVENT_REGISTER = '/public/event/{id}/register'
+    static readonly PAGES = '/pages/{id}'
 }
 export { URLS };
