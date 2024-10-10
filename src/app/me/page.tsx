@@ -16,8 +16,8 @@ import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable } from "recoil";
 
 function MeInfo(props: any) {
-    const meDetailsLoadable = useRecoilValueLoadable(mePageQuery);
     const genderDetailsLoadable = useRecoilValueLoadable(genderQuery);
+    const meDetailsLoadable = useRecoilValueLoadable(mePageQuery);
     const [genders, setGenders] = useState<GenderProps[]>([]);
     const handleGender = (event: SelectChangeEvent) => {
         props.setGender(event.target.value as string);
@@ -58,7 +58,7 @@ function MeInfo(props: any) {
                                 </DemoContainer>
                             </LocalizationProvider>
                         </Grid>
-                        {props.user.gender ? (
+                        {genders ? (
                             <Grid size={12}>
                                 <Typography>Género</Typography>
                                 <FormControl fullWidth>
@@ -131,8 +131,6 @@ export default function MePage() {
     }
     return (
         <>
-
-
             <Stack direction="column"
                 spacing={0.5}
                 sx={{
