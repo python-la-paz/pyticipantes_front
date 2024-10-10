@@ -19,8 +19,8 @@ export type UserProps = {
 };
 
 export type GenderProps = {
-    name: string;
     _id: string;
+    name: string;
 };
 
 export type EventProps = {
@@ -41,10 +41,16 @@ export type EventProps = {
     finished?: boolean;
     tags?: string[];
     organizers?: string[];
-    additional_info?: string[];
+    additional_info: string[];
     document_required?: boolean;
     automatic?: boolean;
     _id: string;
+};
+
+export type FileBlobProps = {
+    name: string;
+    url: string;
+    content_type: string;
 };
 
 export type EventRegisterProps = {
@@ -54,7 +60,7 @@ export type EventRegisterProps = {
     seat?: number;
     status?: string;
     note?: string;
-    document_upload?: string;
+    document_upload: FileBlobProps | null;
     additional_info?: string[];
     _id: string;
 };

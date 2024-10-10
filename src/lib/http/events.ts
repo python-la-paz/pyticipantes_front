@@ -63,3 +63,32 @@ export async function fetchEventRegister(
         return { error, content: [] as EventRegisterProps[] };
     }
 }
+
+export async function registerEvent(
+    id: string,
+    access_token: string,
+    file: any,
+    additionalInfo: string[],
+): Promise<{
+    content: EventRegisterProps;
+    error?: any;
+}> {
+    try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL
+        const url = `${API_URL}${URLS.EVENT_REGISTER.replace("{id}", id)}`;
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+        additionalInfo.forEach((info) => {
+            formData.append("additional_info", info);
+        });
+        const response = await axios.post(url, formData, { "headers": { "Authorization": `Bearer ${access_token}` } });
+        if (response.status !== 200 && response.status !== 201) {
+            throw new Error(`${response.status} - ${response.data}`);
+        }
+        return { content: response.data };
+    }
+    catch (error) {
+        console.error(error);
+        return { error, content: {} as EventRegisterProps };
+    }
+}
