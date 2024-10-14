@@ -12,7 +12,6 @@ export default async function EventLayout({ children }: { children: React.ReactN
             </Head>
             <Container fixed>
                 <Box sx={{
-                    height: '100vh',
                     margin: 'auto', padding: '10px'
                 }} >
                     {children }
