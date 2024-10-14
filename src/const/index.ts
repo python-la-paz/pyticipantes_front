@@ -1,3 +1,9 @@
+export type FileBlobProps = {
+    name: string;
+    url: string;
+    content_type: string;
+};
+
 export type UserProps = {
     username: string;
     email: string;
@@ -29,29 +35,25 @@ export type EventProps = {
     date: Date;
     location: string;
     location_map?: string;
-    image?: string;
+    image?: FileBlobProps;
     document?: string;
     document_type?: string;
     link?: string;
     link_text?: string;
     public?: boolean;
-    quota?: number;
+    quota: number;
     price?: number;
     currency?: string;
     finished?: boolean;
-    tags?: string[];
-    organizers?: string[];
+    tags: string[];
+    organizers: string[];
     additional_info: string[];
     document_required?: boolean;
     automatic?: boolean;
     _id: string;
 };
 
-export type FileBlobProps = {
-    name: string;
-    url: string;
-    content_type: string;
-};
+
 
 export type EventRegisterProps = {
     event: string;

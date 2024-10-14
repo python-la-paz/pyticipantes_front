@@ -1,19 +1,29 @@
 "use client"
 import FullScreenDialog from "@/app/components/dialog";
+import EventRegisterItem from "@/app/components/event.register.item";
 import { accessTokenState, userInfoSelector } from "@/atoms";
 import { eventQuery, eventRegisterQuery } from "@/atoms/selectors.event";
 import { EventRegisterProps } from "@/const";
 import { registerEvent } from "@/lib/http/events";
 import { routes } from "@/lib/urls";
-import { PhotoCamera } from "@mui/icons-material";
-import { Button, Container, TextField, Typography } from "@mui/material";
+import { LocationOn, PhotoCamera } from "@mui/icons-material";
+import { Alert, Button, Chip, Container, Divider, List, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
-
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PublicIcon from '@mui/icons-material/Public';
+import FaceIcon from '@mui/icons-material/Face';
+import PaidIcon from '@mui/icons-material/Paid';
+import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
+import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import Image from "next/image";
 export default function Page({ params }: { params: { id: string } }) {
     const [token] = useRecoilState(accessTokenState);
     const { enqueueSnackbar } = useSnackbar();
@@ -56,10 +66,10 @@ export default function Page({ params }: { params: { id: string } }) {
         // save
         registerEvent(params.id, token, selectedFile, additionalInfoResponses).then((response) => {
             if (response.error) {
-                enqueueSnackbar("Error al registrar", { variant: "error" });
+                enqueueSnackbar(response.message, { variant: "error" });
                 return;
             }
-            enqueueSnackbar("Registrado", { variant: "success" });
+            enqueueSnackbar(response.message, { variant: "success" });
             setOpen(false);
             refreshUserInfo((oldValue) => oldValue + 1);
             // reload data from server
@@ -84,30 +94,71 @@ export default function Page({ params }: { params: { id: string } }) {
         return <p>Error: {eventLoadable.contents}</p>;
     }
     const event = eventLoadable.contents.content;
+    const documentText = event.document_type ? event.document_type : "Documento";
+    const linkText = event.link_text ? event.link_text : "Enlace";
     return (
         <>
             <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><h1>{event._id}</h1></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.title}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.description}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.date.toString()}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.location}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.location_map}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.image}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.document}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.document_type}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.link}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.link_text}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.public}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.quota}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.price}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.currency}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.finished}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.tags}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.organizers}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.additional_info}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.document_required}</p></Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}><p>{event.automatic}</p></Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <Typography variant="h4">{event.title}</Typography>
+                    <Typography variant="caption">{event.finished ? "Finalizado" : "Activo"}</Typography>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <Typography variant="subtitle1">{event.description}</Typography>
+                    <Typography variant="caption">{event.tags.join(", ")}</Typography>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <Stack direction="row" spacing={1}>
+                        <Chip icon={<AccessTimeFilledIcon />} label={dayjs(event.date).format("DD/MM/YYYY")} variant="outlined" />
+                        <Chip icon={<FaceIcon />} label={event.quota > 0 ? `Cupos: ${event.quota}` : `Cupos: Ilimitados`} color="primary" variant="outlined" />
+                        <Chip icon={<PaidIcon />} label={event.price ? `${event.price} ${event.currency}` : "Gratuito"} color="secondary" variant="outlined" />
+                    </Stack>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <Stack direction="row" spacing={1}>
+                        {!event.location_map ? <Chip icon={<LocationOnIcon />} label={event.location} variant="outlined" />
+                            : <Chip icon={<LocationOnIcon />} label={event.location} variant="filled" color="primary" onClick={() => window.open(event.location_map, '_blank')} />
+                        }
+                        {event.document && <Chip icon={<DescriptionIcon />} label={`${documentText.toUpperCase()}`} color="primary" variant="filled" onClick={() => window.open(event.document, '_blank')} />}
+                        {event.link && <Chip icon={<PublicIcon />} label={linkText.toUpperCase()} variant="filled" color="primary" onClick={() => window.open(event.link, '_blank')} />}
+                    </Stack>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <Stack direction="row" spacing={1}>
+                        <Chip
+                            icon={event.automatic ? <HourglassDisabledIcon /> : <HourglassTopIcon />}
+                            label={event.automatic ? "Registro automático" : "Requiere confirmación"}
+                            color={event.automatic ? "success" : "error"}
+                            variant="outlined" />
+                    </Stack>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }} textAlign={"center"}>
+                    {event.image ? <Image src={event.image?.url} alt={event.title} width={300} height={300} /> : null}
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <Typography variant="subtitle1">{"Organizado por:"}</Typography>
+                    <Typography variant="caption">{event.organizers.join(", ")}</Typography>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    {
+                        event.additional_info && event.additional_info.length > 0 && (
+                            <Stack spacing={1}>
+                                <Alert severity="info" variant="outlined" >Información adicional al registrarse</Alert>
+                                {event.additional_info.map((info: string, index: number) => (
+                                    <Typography key={info}>{index + 1}. {info}</Typography>
+                                ))
+                                }
+                            </Stack>
+                        )
+                    }
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    {
+                        event.document_required && (
+                            <Alert severity="warning" variant="outlined">Se requiere subir un documento al momento de registrarse</Alert>
+                        )
+                    }
+                </Grid>
                 {!session ? (
                     <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
                         <Link href={routes.login}>
@@ -122,20 +173,20 @@ export default function Page({ params }: { params: { id: string } }) {
                         </Button>
                     </Grid>
                 )}
-                <ul>
+                <Divider variant='inset' />
+                {registersNoRejected.length > 0 && (
+                    <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                        <Typography variant="h6">Registros realizados</Typography>
+                    </Grid>
+                )}
+                <List sx={{ width: '100%' }}>
                     {registers.map((register: EventRegisterProps) => (
-                        <li key={register._id}>
-                            <p>{register.event}</p>
-                            <p>{register.user}</p>
-                            <p>{register.date.toString()}</p>
-                            <p>{register.seat}</p>
-                            <p>{register.status}</p>
-                            <p>{register.note}</p>
-                            <p>{register.document_upload?.url}</p>
-                            <p>{register.additional_info}</p>
-                        </li>
+                        <>
+                            <EventRegisterItem key={register._id} register={register} />
+                            <Divider variant='inset' />
+                        </>
                     ))}
-                </ul>
+                </List>
             </Grid>
             <FullScreenDialog props={{
                 title: "Registro",
