@@ -1,20 +1,14 @@
-import * as React from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import { Box } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
+import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions';
-import { useRecoilState } from 'recoil';
-import { dialogOpenState } from '@/atoms';
-import { Box } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -35,11 +29,6 @@ export default function FullScreenDialog({ children, props }: {
         saveText?: string,
     }
 }) {
-
-    const handleClickOpen = () => {
-        if (props.openFunction)
-            props.openFunction();
-    };
 
     const handleClose = () => {
         if (props.closeFunction)

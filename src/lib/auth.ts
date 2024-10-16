@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { fetchLoginAPI } from "@/lib/http/auth";
@@ -28,7 +29,7 @@ export const authOptions: NextAuthOptions = {
             }
             return token
         },
-        async session({ session, token, user }: any) {
+        async session({ session, token }: any) {
             session.accessToken = token.accessToken
             return session
         }

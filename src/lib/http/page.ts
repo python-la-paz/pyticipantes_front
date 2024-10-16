@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { PageProps } from "@/const";
 import axios from "axios";
 import { URLS } from "./urls";
@@ -14,7 +15,6 @@ export async function fetchPageBySlug(slug: string): Promise<{
         }
         return { content: response.data };
     } catch (error) {
-        console.error(error);
         return { error, content: {} as PageProps };
     }
 }

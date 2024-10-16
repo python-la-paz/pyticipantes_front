@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
 import { URLS } from "./urls";
 import { EventProps, EventRegisterProps } from "@/const";

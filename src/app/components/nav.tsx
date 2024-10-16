@@ -3,7 +3,7 @@ import { accessTokenState } from '@/atoms';
 import { fetchSignOutAPI } from '@/lib/http/auth';
 import { routes } from '@/lib/urls';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuIcon from '@mui/icons-material/Menu';
+import MoreIcon from "@mui/icons-material/MoreVert";
 import { Avatar } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -19,28 +19,25 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 export default function MenuAppBar({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
-
-    const [auth, setAuth] = useState(true);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<null | HTMLElement>(null);
     const [token, setAccessTokenState] = useRecoilState(accessTokenState);
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAuth(event.target.checked);
-    };
+
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+
     const handleMenuClose = () => {
         setAnchorEl(null);
         handleMobileMenuClose();
     };
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
+    };
+    const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setMobileMoreAnchorEl(event.currentTarget);
     };
 
     useEffect(() => {
@@ -54,7 +51,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
     const mobileMenuId = "primary-search-account-menu-mobile";
 
     const renderLogged = (
-        <>
+        <div>
             <Link href={routes.profile} aria-label="Perfil">
                 <MenuItem>Perfil</MenuItem>
             </Link>
@@ -65,7 +62,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
             }}>
                 <MenuItem>Salir</MenuItem>
             </a>
-        </>
+        </div>
     )
     const renderNotLogged = (
         <a href={routes.login} onClick={(e) => {
@@ -91,15 +88,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
             }}
             open={isMenuOpen}
             onClose={handleMenuClose}>
-            {session ? (
-                <div>
-                    {renderLogged}
-                </div>
-            ) : (
-                <div>
-                    {renderNotLogged}
-                </div>
-            )}
+            {session ? renderLogged : renderNotLogged}
         </Menu>
     );
     const renderMobileMenu = (
@@ -109,15 +98,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
             keepMounted
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}>
-            {session ? (
-                <div>
-                    {renderLogged}
-                </div>
-            ) : (
-                <div>
-                    {renderNotLogged}
-                </div>
-            )}
+            {session ? renderLogged : renderNotLogged}
         </Menu>
     );
 
@@ -131,36 +112,66 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
                             Pyticipantes
                         </Link>
                     </Typography>
-                    <IconButton
-                        size="large"
-                        aria-label="account of current user"
-                        aria-controls="menu-appbar"
-                        aria-haspopup="true"
-                        onClick={handleMenu}
-                        color="inherit"
-                    >
-                        <Avatar sx={{ borderColor: (theme) => theme.palette.secondary.main, borderStyle: "solid" }}>
-                            {status === "authenticated" && session ?
-                                <>
-                                    {session.user.image !== null && session.user.image !== undefined ?
-                                        <>
-                                            {session.user.name !== null && session.user.name !== undefined ?
-                                                <Image src={session.user.image} alt={session.user.name} layout="fill" /> :
-                                                <Image src={session.user.image} alt="Usuario" layout="fill" />
-                                            }
-                                        </> :
-                                        null}
+                    <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                        <IconButton
+                            size="large"
+                            aria-label="account of current user"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleMenu}
+                            color="inherit"
+                        >
+                            <Avatar sx={{ borderColor: (theme) => theme.palette.secondary.main, borderStyle: "solid" }}>
+                                {status === "authenticated" && session ?
+                                    <>
+                                        {session.user.image !== null && session.user.image !== undefined ?
+                                            <>
+                                                {session.user.name !== null && session.user.name !== undefined ?
+                                                    <Image src={session.user.image} alt={session.user.name} layout="fill" /> :
+                                                    <Image src={session.user.image} alt="Usuario" layout="fill" />
+                                                }
+                                            </> :
+                                            null}
 
-                                </>
-                                :
-                                <AccountCircle />
-                            }
-                        </Avatar>
-                    </IconButton>
-                    {renderMobileMenu}
-                    {renderMenu}
+                                    </>
+                                    :
+                                    <AccountCircle />
+                                }
+                            </Avatar>
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ display: { xs: "flex", md: "none" } }}>
+                        <IconButton
+                            size="large"
+                            aria-label="show more"
+                            aria-controls={mobileMenuId}
+                            aria-haspopup="true"
+                            onClick={handleMobileMenuOpen}
+                            color="inherit"
+                        >
+                            <Avatar sx={{ borderColor: (theme) => theme.palette.secondary.main, borderStyle: "solid" }}>
+                                {status === "authenticated" && session ?
+                                    <>
+                                        {session.user.image !== null && session.user.image !== undefined ?
+                                            <>
+                                                {session.user.name !== null && session.user.name !== undefined ?
+                                                    <Image src={session.user.image} alt={session.user.name} fill /> :
+                                                    <Image src={session.user.image} alt="Usuario" fill />
+                                                }
+                                            </> :
+                                            null}
+
+                                    </>
+                                    :
+                                    <MoreIcon />
+                                }
+                            </Avatar>
+                        </IconButton>
+                    </Box>
                 </Toolbar>
             </AppBar>
+            {renderMobileMenu}
+            {renderMenu}
             {children}
         </Box>
     );

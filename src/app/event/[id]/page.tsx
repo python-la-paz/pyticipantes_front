@@ -6,24 +6,24 @@ import { eventQuery, eventRegisterQuery } from "@/atoms/selectors.event";
 import { EventRegisterProps } from "@/const";
 import { registerEvent } from "@/lib/http/events";
 import { routes } from "@/lib/urls";
-import { LocationOn, PhotoCamera } from "@mui/icons-material";
+import { PhotoCamera } from "@mui/icons-material";
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import DescriptionIcon from '@mui/icons-material/Description';
+import FaceIcon from '@mui/icons-material/Face';
+import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
+import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PaidIcon from '@mui/icons-material/Paid';
+import PublicIcon from '@mui/icons-material/Public';
 import { Alert, Button, Chip, Container, Divider, List, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import DescriptionIcon from '@mui/icons-material/Description';
-import PublicIcon from '@mui/icons-material/Public';
-import FaceIcon from '@mui/icons-material/Face';
-import PaidIcon from '@mui/icons-material/Paid';
-import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
-import HourglassTopIcon from '@mui/icons-material/HourglassTop';
-import Image from "next/image";
 export default function Page({ params }: { params: { id: string } }) {
     const [token] = useRecoilState(accessTokenState);
     const { enqueueSnackbar } = useSnackbar();
@@ -36,19 +36,19 @@ export default function Page({ params }: { params: { id: string } }) {
     const refreshUserInfo = useSetRecoilState(userInfoSelector);
     const [registers, setRegisters] = useState<EventRegisterProps[]>([]);
     const [registersNoRejected, setRegistersNoRejected] = useState<EventRegisterProps[]>([]);
-    const handleFileChange = (event: any) => {
-        const file = event.target.files[0];
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
         if (!file) {
             setSelectedFile({ name: "" });
             return;
         }
         setSelectedFile(file);
     };
-    const handleAdditionalInfoChange = (event: any) => {
+    const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         const index = event.target.id;
         setAdditionalInfoResponses((prev) => {
-            prev[index] = value;
+            prev[parseInt(index)] = value;
             return prev;
         });
     }

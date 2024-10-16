@@ -2,7 +2,6 @@ import { EventProps } from "@/const";
 import { routes } from "@/lib/urls";
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
 import Link from "next/link";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
         return text.slice(0, maxLength) + '...';
