@@ -21,7 +21,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG NEXT_PUBLIC_API_URL_ARG
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL_ARG
-RUN yarn build
+RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
