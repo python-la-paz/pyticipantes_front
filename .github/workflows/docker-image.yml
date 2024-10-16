@@ -59,5 +59,3 @@ jobs:
             ${{env.DOCKER_GCR}}/${{env.DOCKER_IMAGE}}:${{ env.IMAGE_TAG_LATEST }}
             ${{env.DOCKER_GCR}}/${{env.DOCKER_IMAGE}}:${{env.IMAGE_TAG}}
             ${{env.DOCKER_GCR}}/${{env.DOCKER_IMAGE}}:${{env.TAG}}
-          cache-from: type=registry,ref=${{env.DOCKER_GCR}}/${{env.DOCKER_IMAGE}}:${{ env.IMAGE_TAG_LATEST }}
-          cache-to: type=registry,ref=${{env.DOCKER_GCR}}/${{env.DOCKER_IMAGE}}:${{ env.IMAGE_TAG_LATEST }},mode=max
