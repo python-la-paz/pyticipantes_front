@@ -22,8 +22,7 @@ jobs:
           TAG=$(git describe --tags --abbrev=7 --always)
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "Version: $TAG"
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         
@@ -48,10 +47,10 @@ jobs:
           docker pull ${{env.DOCKER_GCR}}/${{env.DOCKER_IMAGE}}:${{ env.IMAGE_TAG_LATEST }} || true
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4.1.1
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64/v8
           push: true
           build-args: |
             NEXT_PUBLIC_API_URL_ARG=${{env.NEXT_PUBLIC_API_URL}}
