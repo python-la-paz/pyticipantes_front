@@ -1,7 +1,10 @@
 import { EventProps } from "@/const";
 import { routes } from "@/lib/urls";
+import dayjs from "dayjs";
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
 import Link from "next/link";
+import 'dayjs/locale/es';
+
 const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
         return text.slice(0, maxLength) + '...';
@@ -10,17 +13,18 @@ const truncateText = (text: string, maxLength: number) => {
 };
 const randomColors = ['#FF5722', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#03A9F4'];
 export default function EventItem(props: EventProps) {
+    dayjs.locale('es');
     const event = props;
     const backgroundColor = !event.image ? randomColors[Math.floor(Math.random() * randomColors.length)] : 'transparent';
     const link = routes.event.replace('{id}', event._id);
     return (
-        <Card sx={{ maxWidth: 345 }}>
+        <Card sx={{ Width: 100, borderRadius: '20px', boxShadow: '2px 2px 2px 2px rgba(0, 0, 0, 0.25)' }}>
             <Link href={link} passHref>
                 <CardActionArea>
                     {event.image ? (
                         <CardMedia
                             component="img"
-                            height="140"
+                            height="180"
                             image={event.image.url}
                             alt={event.title}
                         />
@@ -38,14 +42,16 @@ export default function EventItem(props: EventProps) {
                                 fontWeight: 'bold',
                             }}
                         >
-                            {event.title}
                         </CardMedia>
                     )}
-                    <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
+                    <CardContent sx={{ backgroundColor: "white" }}>
+                        <Typography color="green" fontSize="14px">
+                            {event.location}, Bolivia • {dayjs(event.date).format("DD [de] MMMM [de] YYYY")}
+                        </Typography>
+                        <Typography gutterBottom variant="h5" component="div" color="red" fontSize="20px">
                             {event.title}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }} fontSize="16px">
                             {truncateText(event.description, 125)}
                         </Typography>
                     </CardContent>
