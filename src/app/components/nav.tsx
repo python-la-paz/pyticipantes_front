@@ -2,19 +2,13 @@
 import { accessTokenState } from '@/atoms';
 import { fetchSignOutAPI } from '@/lib/http/auth';
 import { routes } from '@/lib/urls';
-import { AccountBalance } from '@mui/icons-material';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MoreIcon from "@mui/icons-material/MoreVert";
-import { Avatar, Button, colors } from '@mui/material';
+import { Button} from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -27,9 +21,9 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
     const handleMenuClose = () => {
         setAnchorEl(null);
@@ -38,9 +32,9 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
     };
-    const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setMobileMoreAnchorEl(event.currentTarget);
-    };
+    // const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    //     setMobileMoreAnchorEl(event.currentTarget);
+    // };
 
     useEffect(() => {
         if (status === "authenticated") {
