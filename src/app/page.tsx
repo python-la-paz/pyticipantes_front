@@ -5,7 +5,7 @@ import { eventsQuery } from '@/atoms/selectors.event';
 import { EventProps } from '@/const';
 import styles from "@/app/page.module.css";
 import EventItem from './components/event.item';
-import { Box, Typography } from '@mui/material';
+import { Box} from '@mui/material';
 function EventList() {
     const events = useRecoilValueLoadable(eventsQuery);
     if (events.state === 'loading') {
