@@ -15,9 +15,9 @@ import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable } from "recoil";
 
-function MeInfo(props: any) {
-    const meDetailsLoadable = useRecoilValueLoadable(mePageQuery);
+function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, setBirthday: (value: Dayjs) => void, setGender: (value: string) => void, saveUser: () => void }) {
     const genderDetailsLoadable = useRecoilValueLoadable(genderQuery);
+    const meDetailsLoadable = useRecoilValueLoadable(mePageQuery);
     const [genders, setGenders] = useState<GenderProps[]>([]);
     const handleGender = (event: SelectChangeEvent) => {
         props.setGender(event.target.value as string);
@@ -26,6 +26,7 @@ function MeInfo(props: any) {
         if (meDetailsLoadable.state === 'hasValue') {
             props.setUser(meDetailsLoadable.contents.content);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [meDetailsLoadable]);
     useEffect(() => {
         if (genderDetailsLoadable.state === 'hasValue') {
@@ -54,17 +55,17 @@ function MeInfo(props: any) {
                             <Typography>Fecha Nacimiento</Typography>
                             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
                                 <DemoContainer components={['DatePicker']}>
-                                    <DatePicker value={dayjs(props.user.birthday)} onChange={(newValue) => props.setBirthday(newValue)} />
+                                    <DatePicker value={dayjs(props.user.birthday)} onChange={(newValue) => newValue && props.setBirthday(newValue)} />
                                 </DemoContainer>
                             </LocalizationProvider>
                         </Grid>
-                        {props.user.gender ? (
+                        {genders ? (
                             <Grid size={12}>
                                 <Typography>Género</Typography>
                                 <FormControl fullWidth>
                                     <Select
                                         id="select-gender"
-                                        value={props.user.gender}
+                                        value={props.user.gender || ''}
                                         onChange={handleGender}
                                     >
                                         {genders.map((option) => (
@@ -119,11 +120,11 @@ export default function MePage() {
         setUser({ ...user, birthday: value.toDate() });
     }
     const saveUser = () => {
-        updateMe(token, user).then((response) => {
+        updateMe(token, user).then(() => {
             enqueueSnackbar(`Se actualizó el usuario`, {
                 variant: "success",
             })
-        }).catch((error) => {
+        }).catch(() => {
             enqueueSnackbar(`Error al actualizar el usuario`, {
                 variant: "error",
             })
@@ -131,8 +132,6 @@ export default function MePage() {
     }
     return (
         <>
-
-
             <Stack direction="column"
                 spacing={0.5}
                 sx={{
@@ -140,7 +139,8 @@ export default function MePage() {
                     alignItems: "center",
                 }}>
                 <MeInfo
-                    user={user} setUser={setUser}
+                    user={user}
+                    setUser={setUser}
                     setBirthday={setBirthday}
                     setGender={setGender}
                     saveUser={saveUser}

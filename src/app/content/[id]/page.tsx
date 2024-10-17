@@ -1,12 +1,12 @@
 "use client"
 import { pageQuery } from "@/atoms/selectors.page";
 import { PageProps } from "@/const";
-import { useEffect, useState } from "react";
-import { useRecoilValueLoadable } from "recoil";
-import { unified } from 'unified'
-import remarkParse from 'remark-parse'
-import remarkHtml from 'remark-html'
 import Grid from "@mui/material/Grid2";
+import { useState } from "react";
+import { useRecoilValueLoadable } from "recoil";
+import remarkHtml from 'remark-html';
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
 export default function Page({ params }: { params: { id: string } }) {
     const pageLoadable = useRecoilValueLoadable(pageQuery({ id: params.id }));
     const [html, setHtml] = useState<string>("");

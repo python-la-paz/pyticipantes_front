@@ -2,7 +2,6 @@ import { EventProps } from "@/const";
 import { routes } from "@/lib/urls";
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
 import Link from "next/link";
-
 const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
         return text.slice(0, maxLength) + '...';
@@ -22,7 +21,7 @@ export default function EventItem(props: EventProps) {
                         <CardMedia
                             component="img"
                             height="140"
-                            image={event.image}
+                            image={event.image.url}
                             alt={event.title}
                         />
                     ) : (

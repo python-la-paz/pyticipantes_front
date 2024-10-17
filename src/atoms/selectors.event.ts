@@ -1,4 +1,4 @@
-import { accessTokenState, eventPageState } from "@/atoms";
+import { accessTokenState, eventPageState, userInfoSelector } from "@/atoms";
 import { EventRegisterProps } from "@/const";
 import { fetchEvent, fetchEventRegister, fetchEvents } from "@/lib/http/events";
 import { selector, selectorFamily } from "recoil";
@@ -27,6 +27,7 @@ export const eventQuery = selectorFamily({
 export const eventRegisterQuery = selectorFamily({
     key: "eventRegisterQuery",
     get: (param: { id: string }) => async ({ get }) => {
+        get(userInfoSelector);
         const at = get(accessTokenState);
         if (param.id !== "") {
             const response = await fetchEventRegister(param.id, at);
