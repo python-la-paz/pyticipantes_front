@@ -11,3 +11,4 @@ README.md
 .env.example
 .gitignore
 k8s
+docker-compose*.yaml
