@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 .page {
   --gray-rgb: 0, 0, 0;
   --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
@@ -166,7 +168,7 @@ a.secondary {
 
 .itemList {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 256px);
+  grid-template-columns: repeat(auto-fit, 360px);
   gap: 2rem;
   justify-content: start;
 }
@@ -175,5 +177,34 @@ a.secondary {
 
   .itemList {
     justify-content: center;
+  }
+}
+
+.backgroundImage {
+  max-height: 80%;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+@media(max-width: 600px) {
+  .backgroundImage {
+    max-height: 1000px;
+    height: 300px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+}
+
+.logoNav {
+  width: 3vw;
+  height: 3vw;
+  margin-left: 100px;
+}
+
+@media(max-width: 900px) {
+  .logoNav {
+    width: 7vw;
+    height: 7vw;
+    margin-left: 10px;
   }
 }
