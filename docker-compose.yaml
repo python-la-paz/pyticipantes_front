@@ -1,0 +1,12 @@
+version: '3'
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL_ARG=http://localhost:8000/api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
