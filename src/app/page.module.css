@@ -188,8 +188,8 @@ a.secondary {
 
 @media(max-width: 600px) {
   .backgroundImage {
-    max-height: 1000px;
-    height: 300px;
+    max-height: 350px;
+    height: 350px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
   }

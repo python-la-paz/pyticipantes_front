@@ -38,6 +38,7 @@ export default function Page() {
                     top: 0,
                     left: 0,
                     width: '100%',
+                    height: 'auto',
                     boxShadow: '4px 4px 4px 4px rgba(0, 0, 0, 0.25)',
                     zIndex: "-1"
                 }}

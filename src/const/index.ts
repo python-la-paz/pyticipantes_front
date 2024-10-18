@@ -29,6 +29,11 @@ export type GenderProps = {
     name: string;
 };
 
+export type ProfessionProps = {
+    _id: string;
+    name: string;
+};
+
 export type EventProps = {
     title: string;
     description: string;
