@@ -165,23 +165,8 @@ a.secondary {
     filter: invert();
   }
 }
-
-.itemList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 360px);
-  gap: 2rem;
-  justify-content: start;
-}
-
-@media (max-width: 600px) {
-
-  .itemList {
-    justify-content: center;
-  }
-}
-
 .backgroundImage {
-  max-height: 80%;
+  height: 550px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 }
@@ -206,5 +191,15 @@ a.secondary {
     width: 7vw;
     height: 7vw;
     margin-left: 10px;
+  }
+  .backgroundImage{
+    height: 400px;
+  }
+}
+
+@media (max-width:450px){
+  .backgroundImage{
+    max-height: 1000px;
+    height:300px;
   }
 }

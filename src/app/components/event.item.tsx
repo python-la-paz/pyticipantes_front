@@ -18,7 +18,12 @@ export default function EventItem(props: EventProps) {
     const backgroundColor = !event.image ? randomColors[Math.floor(Math.random() * randomColors.length)] : 'transparent';
     const link = routes.event.replace('{id}', event._id);
     return (
-        <Card sx={{ Width: 100, borderRadius: '20px', boxShadow: '2px 2px 2px 2px rgba(0, 0, 0, 0.25)' }}>
+        <Card sx={{
+            marginLeft:{xs:"40px", md: "20px"}, 
+            marginRight:{xs:"40px", md: "20px"}, 
+            borderRadius: '20px', 
+            boxShadow: '2px 2px 2px 2px rgba(0, 0, 0, 0.25)', 
+            alignSelf:"center"}}>
             <Link href={link} passHref>
                 <CardActionArea>
                     {event.image ? (
