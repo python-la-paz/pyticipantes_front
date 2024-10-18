@@ -52,3 +52,20 @@ export async function fetchGender(access_token: string): Promise<{
         return { error, content: [] };
     }
 }
+export async function fetchProfession(access_token: string): Promise<{
+    content: string[];
+    error?: any;
+}> {
+    try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL
+        const response = await axios.get(`${API_URL}${URLS.PROFESSION}`, { "headers": { "Authorization": `Bearer ${access_token}` } });
+        if (response.status !== 200) {
+            throw new Error(`${response.status} - ${response.data}`);
+        }
+        return { content: response.data };
+    }
+    catch (error) {
+        console.error(error);
+        return { error, content: [] };
+    }
+}

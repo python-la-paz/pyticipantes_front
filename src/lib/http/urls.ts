@@ -8,5 +8,6 @@ class URLS {
     static readonly EVENT_REGISTER = '/public/event/{id}/register'
     static readonly PAGES = '/pages/{id}'
     static readonly FILE = '/public/files/{id}'
+    static readonly PROFESSION = '/public/profession'
 }
 export { URLS };
