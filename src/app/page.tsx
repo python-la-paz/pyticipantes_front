@@ -5,7 +5,7 @@ import { eventsQuery } from '@/atoms/selectors.event';
 import { EventProps } from '@/const';
 import styles from "@/app/page.module.css";
 import EventItem from './components/event.item';
-import { Box} from '@mui/material';
+import { Box, Grid2 } from '@mui/material';
 function EventList() {
     const events = useRecoilValueLoadable(eventsQuery);
     if (events.state === 'loading') {
@@ -16,11 +16,15 @@ function EventList() {
     }
     const data = events.contents.content;
     return (
-        <div className={styles.itemList}>
+        <Grid2 container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             {data.map((event: EventProps) => (
-                <EventItem key={event._id} {...event} />
+                <Grid2 size={{ xs: 4, sm: 4, md: 4 }} key={event._id}>
+                    <Box sx={{ alignItems: "center", alignContent: "center" }} >
+                        <EventItem key={event._id} {...event} />
+                    </Box>
+                </Grid2>
             ))}
-        </div>
+        </Grid2>
     );
 }
 export default function Page() {
@@ -59,8 +63,8 @@ export default function Page() {
                     justifyContent: 'center',
                     flexDirection: 'column',
                     paddingTop: {
-                        xs: "20px",
-                        md: "60px"
+                        xs: "2rem",
+                        md: "2rem"
                     }
                 }}>
                     <img
@@ -71,7 +75,7 @@ export default function Page() {
                     <Box
                         sx={{
                             fontSize: {
-                                xs: "16px",
+                                xs: "24px",
                                 md: "24px"
                             },
                             color: "white",
@@ -87,7 +91,7 @@ export default function Page() {
                     <Box
                         sx={{
                             fontSize: {
-                                xs: '20px',
+                                xs: '30px',
                                 md: '48px'
                             },
                             color: "white",
