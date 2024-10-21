@@ -2,7 +2,7 @@
 import { accessTokenState } from '@/atoms';
 import { fetchSignOutAPI } from '@/lib/http/auth';
 import { routes } from '@/lib/urls';
-import { Button} from '@mui/material';
+import { Button } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
@@ -13,14 +13,19 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import styles from '../page.module.css'
-export default function MenuAppBar({ children }: { children: React.ReactNode }) {
+import { useRouter } from 'next/navigation';
+import { fetchMe } from '@/lib/http/user';
+interface MenuAppBarProps {
+    children?: React.ReactNode; // Make children optional
+}
+export default function MenuAppBar({ children }: MenuAppBarProps) {
     const { data: session, status } = useSession();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<null | HTMLElement>(null);
     const [token, setAccessTokenState] = useRecoilState(accessTokenState);
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
+    const router = useRouter();
     // const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     //     setAnchorEl(event.currentTarget);
     // };
@@ -32,13 +37,19 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
     };
-    // const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    //     setMobileMoreAnchorEl(event.currentTarget);
-    // };
 
     useEffect(() => {
         if (status === "authenticated") {
             setAccessTokenState(session.accessToken);
+            fetchMe(session.accessToken).then((response) => {
+                if (response.content.new) {
+                    router.push(routes.profile);
+                }
+            }
+            ).catch((error) => {
+                console.error(error);
+            });
+
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session, status]);
@@ -129,7 +140,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
                                     background: "transparent",
                                     borderRadius: "20px",
                                     textTransform: 'none',
-                                    marginRight: { xs: '10px'},
+                                    marginRight: { xs: '10px' },
                                     fontSize: '16px',
                                     '&:hover': {
                                         backgroundColor: 'white',
@@ -138,7 +149,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
                                     transition: 'all 0.15s ease'
                                 }}
                             >
-                                Cerrar sesion
+                                Cerrar Sesión
                             </Button>
                             <Button
                                 variant="outlined"
@@ -182,7 +193,7 @@ export default function MenuAppBar({ children }: { children: React.ReactNode }) 
                                     transition: 'all 0.15s ease'
                                 }}
                             >
-                                Iniciar Sesion
+                                Iniciar Sesión
                             </Button>
                         </>
                     }

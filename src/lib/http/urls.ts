@@ -9,5 +9,8 @@ class URLS {
     static readonly PAGES = '/pages/{id}'
     static readonly FILE = '/public/files/{id}'
     static readonly PROFESSION = '/public/profession'
+    static readonly LOCATION = '/public/location'
+    static readonly PROGRAMMING_LANGUAGE = '/public/programminglanguage'
+    static readonly SOCIAL_NETWORK = '/public/socialnetwork'
 }
 export { URLS };

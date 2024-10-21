@@ -1,5 +1,6 @@
-import axios from "axios";
+import { TokenProps } from "@/const";
 import { URLS } from "@/lib/http/urls";
+import axios from "axios";
 
 export async function fetchLoginAPI(access_token: string) {
     try {
@@ -8,7 +9,7 @@ export async function fetchLoginAPI(access_token: string) {
         if (response.status !== 200) {
             throw new Error(`${response.status} - ${response.data}`);
         }
-        return response.data.token;
+        return response.data as TokenProps;
     } catch (error) {
         console.error(error);
         throw new Error("Error to login");

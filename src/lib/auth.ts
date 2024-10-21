@@ -8,9 +8,15 @@ declare module "next-auth" {
      */
     interface Session {
         accessToken: string,
+        new: boolean,
         user: {
-            /** The user's postal address. */
         } & DefaultSession["user"]
+    }
+}
+declare module 'next-auth/jwt' {
+    interface JWT {
+        accessToken: string,
+        new: boolean,
     }
 }
 export const authOptions: NextAuthOptions = {
@@ -24,15 +30,21 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, account }: any) {
             if (account) {
-                const accessToken = await fetchLoginAPI(account.access_token)
-                token.accessToken = accessToken
+                const login = await fetchLoginAPI(account.access_token)
+                token.accessToken = login.token
+                if (typeof login.new !== "undefined") {
+                    token.new = login.new;
+                }
             }
             return token
         },
         async session({ session, token }: any) {
             session.accessToken = token.accessToken
+            if (typeof token.new !== "undefined") {
+                session.new = token.new;
+            }
             return session
-        }
-    }
+        },
+    },
 }
 export default NextAuth(authOptions)

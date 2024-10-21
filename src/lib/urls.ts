@@ -1,7 +1,7 @@
 export const routes = {
     root: '/',
     profile: '/me',
-    login: '/api/auth/signin',
+    login: '/login',
     logout: '/api/auth/signout',
     event: '/event/{id}',
 };

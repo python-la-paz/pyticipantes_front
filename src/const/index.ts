@@ -1,7 +1,19 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+export type TokenProps = {
+    token: any,
+    new: boolean,
+};
+
 export type FileBlobProps = {
     name: string;
     url: string;
     content_type: string;
+};
+
+export type UserSkillProps = {
+    skill: string;
+    name: string;
+    level: number;
 };
 
 export type UserProps = {
@@ -21,6 +33,8 @@ export type UserProps = {
     level_programming: number;
     phone: string | null;
     data_complete: boolean;
+    programming_languages: UserSkillProps[];
+    new: boolean;
     _id?: string;
 };
 
@@ -76,5 +90,20 @@ export type PageProps = {
     slug: string;
     title: string;
     html: string;
+    _id: string;
+};
+
+export type LocationProps = {
+    name: string;
+    _id: string;
+};
+
+export type ProgrammingLanguageProps = {
+    name: string;
+    _id: string;
+};
+
+export type SocialNetworkProps = {
+    name: string;
     _id: string;
 };
