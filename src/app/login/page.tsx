@@ -115,7 +115,7 @@ export default function LoginPage() {
                         >
                             <Box
                                 component="img"
-                                src="/icons/logo_m_original.svg"
+                                src="/icons/python_la_paz.svg"
                                 alt="Logo"
                                 sx={{
                                     width: "180px",
@@ -135,14 +135,7 @@ export default function LoginPage() {
                             ¡Bienvenido de nuevo!
                         </Typography>
 
-                        {/* Oculta este texto en pantallas xs */}
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                display: { xs: "none", md: "block" }, // Oculta en xs
-                            }}
-                        >   Inicia sesión ingresando tu correo electrónico y contraseña. Si aún no tienes cuenta, regístrate fácilmente.
-                        </Typography>
+                       
 
                         <Button
                             variant="contained"

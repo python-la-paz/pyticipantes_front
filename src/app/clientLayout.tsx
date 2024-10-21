@@ -13,7 +13,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <>
             {!isLoginPage && <MenuAppBar children={undefined} />}
             {children}
-            {!isLoginPage && <FooterBar />}
+            <FooterBar />
         </>
     );
 }
