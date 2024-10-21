@@ -127,9 +127,6 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
     const setPhone = (value: string) => {
         props.setUser({ ...props.user, phone: value });
     }
-    const setResidence = (value: string) => {
-        props.setUser({ ...props.user, residence: value });
-    }
     const setPlaceProfession = (value: string) => {
         props.setUser({ ...props.user, place_profession: value });
     }
@@ -145,14 +142,17 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
                 <>
                     <Avatar
                         alt={data.given_name}
-                        sx={{ width: 150, height: 150 }}
+                        sx={{ width: 100, height: 100 }}
                     >
-                        <Image src={data.picture} alt={data.given_name} width={150} height={150} />
+                        <Image src={data.picture} alt={data.given_name} width={100} height={100} />
                     </Avatar>
-                    <h1>{data.given_name}</h1>
-                    <h2>{data.family_name}</h2>
-                    <h3>{data.email}</h3>
-                    <hr />
+                    <Typography variant="h3" sx={{ fontWeight: 'medium' }} >{data.given_name}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'medium' }} >{data.family_name}</Typography>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'light' }} >{data.email}</Typography>
+
+                    {data.new && <Typography variant="h5" sx={{ fontWeight: 'light' }}>¡Regístrate y comienza hoy!</Typography>}
+
+                    <Divider  />
                     <Typography variant="h5">{!data.data_complete && "Completa tu perfil para registrarte en eventos"}</Typography>
 
                     <Grid container spacing={2}>

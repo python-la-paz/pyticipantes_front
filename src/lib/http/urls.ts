@@ -11,5 +11,6 @@ class URLS {
     static readonly PROFESSION = '/public/profession'
     static readonly LOCATION = '/public/location'
     static readonly PROGRAMMING_LANGUAGE = '/public/programminglanguage'
+    static readonly SOCIAL_NETWORK = '/public/socialnetwork'
 }
 export { URLS };

@@ -11,7 +11,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     return (
         <>
-            {!isLoginPage && <MenuAppBar children={undefined} />}
+            {!isLoginPage && <MenuAppBar />}
             {children}
             <FooterBar />
         </>

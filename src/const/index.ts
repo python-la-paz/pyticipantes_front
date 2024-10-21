@@ -1,3 +1,9 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+export type TokenProps = {
+    token: any,
+    new: boolean,
+};
+
 export type FileBlobProps = {
     name: string;
     url: string;
@@ -93,6 +99,11 @@ export type LocationProps = {
 };
 
 export type ProgrammingLanguageProps = {
+    name: string;
+    _id: string;
+};
+
+export type SocialNetworkProps = {
     name: string;
     _id: string;
 };

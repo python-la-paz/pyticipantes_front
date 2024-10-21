@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
 import { URLS } from "./urls";
-import { EventProps, EventRegisterProps } from "@/const";
+import { EventProps, EventRegisterProps, SocialNetworkProps } from "@/const";
 export async function fetchEvents(
     page?: number,
     size?: number,
@@ -70,6 +70,7 @@ export async function registerEvent(
     access_token: string,
     file: any,
     additionalInfo: string[],
+    rrss: string,
 ): Promise<{
     content: EventRegisterProps;
     error?: any;
@@ -79,10 +80,12 @@ export async function registerEvent(
         const API_URL = process.env.NEXT_PUBLIC_API_URL
         const url = `${API_URL}${URLS.EVENT_REGISTER.replace("{id}", id)}`;
         const formData = new FormData();
-        formData.append("file", file, file.name);
+        if (file && file.name !== "")
+            formData.append("file", file, file.name);
         additionalInfo.forEach((info) => {
             formData.append("additional_info", info);
         });
+        formData.append("rrss", rrss);
         const response = await axios.post(url, formData, { "headers": { "Authorization": `Bearer ${access_token}` } });
         if (response.status !== 200 && response.status !== 201) {
             if (response.status === 400) {
@@ -127,5 +130,23 @@ export async function fetchImage(
     catch (error) {
         console.error(error);
         return { error, content: "" };
+    }
+}
+
+export async function fetchSocialNetwork(access_token: string): Promise<{
+    content: SocialNetworkProps[];
+    error?: any;
+}> {
+    try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL
+        const response = await axios.get(`${API_URL}${URLS.SOCIAL_NETWORK}`, { "headers": { "Authorization": `Bearer ${access_token}` } });
+        if (response.status !== 200) {
+            throw new Error(`${response.status} - ${response.data}`);
+        }
+        return { content: response.data };
+    }
+    catch (error) {
+        console.error(error);
+        return { error, content: [] };
     }
 }

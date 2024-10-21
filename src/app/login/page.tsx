@@ -1,16 +1,11 @@
 "use client";
-import { useState } from "react";
-import { Button, Stack, TextField, Typography, Grid, Box, Container } from "@mui/material";
-import { useRouter } from "next/navigation"; // Para redireccionar después del login
-import { useSnackbar } from "notistack";
-import GoogleIcon from '@mui/icons-material/Google';
-import { signIn } from 'next-auth/react';
 import { routes } from "@/lib/urls";
+import GoogleIcon from '@mui/icons-material/Google';
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
 
-    const { enqueueSnackbar } = useSnackbar();
-    const router = useRouter();
 
     const handleLogin = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
@@ -135,7 +130,7 @@ export default function LoginPage() {
                             ¡Bienvenido de nuevo!
                         </Typography>
 
-                       
+
 
                         <Button
                             variant="contained"
