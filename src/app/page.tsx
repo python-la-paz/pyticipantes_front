@@ -6,6 +6,7 @@ import { EventProps } from '@/const';
 import styles from "@/app/page.module.css";
 import EventItem from './components/event.item';
 import { Box, Grid2 } from '@mui/material';
+import { useEffect, useState } from 'react';
 function EventList() {
     const events = useRecoilValueLoadable(eventsQuery);
     if (events.state === 'loading') {
@@ -28,6 +29,26 @@ function EventList() {
     );
 }
 export default function Page() {
+    const [screenWidth, setScreenWidth] = useState<number | undefined>(undefined);
+
+    useEffect(() => {
+        const handleResize = () => {
+        setScreenWidth(window.innerWidth);
+        };
+
+        if (typeof window !== 'undefined') {
+            setScreenWidth(window.innerWidth); // Establecer el ancho inicial
+            window.addEventListener('resize', handleResize);
+        }
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    });
+    if (screenWidth === undefined) {
+        return null; // O puedes mostrar un cargando
+    }
     return (
         <Container sx={{ padding: "1rem" }}>
             <img
@@ -42,7 +63,7 @@ export default function Page() {
                     top: 0,
                     left: 0,
                     width: '100%',
-                    height: 'auto',
+                    height: "auto",
                     boxShadow: '4px 4px 4px 4px rgba(0, 0, 0, 0.25)',
                     zIndex: "-1"
                 }}
@@ -62,21 +83,20 @@ export default function Page() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexDirection: 'column',
-                    paddingTop: {
-                        xs: "2rem",
-                        md: "2rem"
-                    }
                 }}>
-                    <img
-                        src="/icons/logo_blanco.svg"
-                        alt="Descripción del ícono"
-                        style={{ width: '8vw', height: '8vw' }}
-                    />
+                    {screenWidth >= 800 ? ( 
+                        <img
+                            src="/icons/logo_blanco.svg"
+                            alt="Descripción del ícono"
+                            style={{ width: '8vw', height: '8vw', paddingTop:"2rem"}}
+                        />
+                    ):(<></>)
+                    }
                     <Box
                         sx={{
                             fontSize: {
-                                xs: "24px",
-                                md: "24px"
+                                xs: "18px",
+                                md: "22px"
                             },
                             color: "white",
                             paddingTop: {
@@ -91,7 +111,7 @@ export default function Page() {
                     <Box
                         sx={{
                             fontSize: {
-                                xs: '30px',
+                                xs: '24px',
                                 md: '48px'
                             },
                             color: "white",
