@@ -50,10 +50,10 @@ export default function EventItem(props: EventProps) {
                         </CardMedia>
                     )}
                     <CardContent sx={{ backgroundColor: "white" }}>
-                        <Typography color="green" fontSize="14px">
+                        <Typography color="primary" fontSize="14px">
                             {event.location}, Bolivia • {dayjs(event.date).format("DD [de] MMMM [de] YYYY")}
                         </Typography>
-                        <Typography gutterBottom variant="h5" component="div" color="red" fontSize="20px">
+                        <Typography gutterBottom variant="h5" component="div" color="secondary" fontSize="20px">
                             {event.title}
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }} fontSize="16px">

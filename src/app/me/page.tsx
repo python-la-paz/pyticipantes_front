@@ -116,18 +116,23 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
     }, [locationDetailsLoadable]);
 
     const setGivenName = (value: string) => {
+        value = value.slice(0, 30);
         props.setUser({ ...props.user, given_name: value });
     }
     const setFamilyName = (value: string) => {
+        value = value.slice(0, 30);
         props.setUser({ ...props.user, family_name: value });
     }
     const setDni = (value: string) => {
+        value = value.slice(0, 10);
         props.setUser({ ...props.user, dni: value });
     }
     const setPhone = (value: string) => {
+        value = value.replace(/\D/g, '').slice(0, 15);
         props.setUser({ ...props.user, phone: value });
     }
     const setPlaceProfession = (value: string) => {
+        value = value.slice(0, 50);
         props.setUser({ ...props.user, place_profession: value });
     }
     const setLevelProgramming = (value: number) => {
@@ -146,13 +151,13 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
                     >
                         <Image src={data.picture} alt={data.given_name} width={100} height={100} />
                     </Avatar>
-                    <Typography variant="h3" sx={{ fontWeight: 'medium' }} >{data.given_name}</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 'medium' }} >{data.family_name}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'medium' }} >{data.given_name}</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 'medium' }} >{data.family_name}</Typography>
                     <Typography variant="subtitle1" sx={{ fontWeight: 'light' }} >{data.email}</Typography>
 
                     {data.new && <Typography variant="h5" sx={{ fontWeight: 'light' }}>¡Regístrate y comienza hoy!</Typography>}
 
-                    <Divider  />
+                    <Divider />
                     <Typography variant="h5">{!data.data_complete && "Completa tu perfil para registrarte en eventos"}</Typography>
 
                     <Grid container spacing={2}>
@@ -172,10 +177,10 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
                             </LocalizationProvider>
                         </Grid>
                         <Grid size={{ xl: 6, lg: 6, md: 12, sm: 12, xs: 12 }}>
-                            <TextField id="tDni" label="Cédula de identidad" variant="outlined" fullWidth value={props.user.dni || ''} onChange={(e) => setDni(e.target.value)} />
+                            <TextField id="tDni" label="Cédula de identidad" variant="outlined" fullWidth value={props.user.dni || ''} onChange={(e) => setDni(e.target.value.replace(/\s+/g, ''))} />
                         </Grid>
                         <Grid size={{ xl: 6, lg: 6, md: 12, sm: 12, xs: 12 }}>
-                            <TextField id="tPhone" label="Teléfono" variant="outlined" fullWidth value={props.user.phone || ''} onChange={(e) => setPhone(e.target.value)} />
+                            <TextField type="number" id="tPhone" label="Teléfono" variant="outlined" fullWidth value={props.user.phone || ''} onChange={(e) => setPhone(e.target.value)} />
                         </Grid>
 
 
@@ -321,7 +326,7 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
                             </Grid>
                         )}
                         <Grid size={{ xl: 12, lg: 12, md: 12, sm: 12, xs: 12 }}>
-                            <Stack direction="row" spacing={1}>
+                            <Stack direction="row" spacing={2} flexWrap={"wrap"} useFlexGap>
                                 {props.user.programming_languages && props.user.programming_languages.map((skill, index) => (
                                     <Chip variant="outlined" key={index} onDelete={() => handleDeleteSkill(skill)} avatar={<Avatar>{
                                         marksProgramming.find((m) => m.value === skill.level)?.label.charAt(0)
@@ -330,7 +335,9 @@ function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, s
                             </Stack>
                         </Grid>
                         <Grid size={12}>
-                            <Button variant="contained" fullWidth onClick={props.saveUser} endIcon={<SendIcon />} >Guardar</Button>
+                            <Button variant="contained" fullWidth onClick={props.saveUser} endIcon={<SendIcon />}
+                                sx={{ borderRadius: "20px", }}
+                            >Guardar</Button>
                         </Grid>
                         <Divider />
                     </Grid >
@@ -375,6 +382,54 @@ export default function MePage() {
         setUser({ ...user, birthday: value.toDate() });
     }
     const saveUser = () => {
+        if (user.given_name.length < 3 || user.given_name.length > 30) {
+            enqueueSnackbar(`El nombre debe tener entre 3 y 30 caracteres`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (user.family_name.length < 3 || user.family_name.length > 30) {
+            enqueueSnackbar(`El apellido debe tener entre 3 y 30 caracteres`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (!user.dni) {
+            enqueueSnackbar(`La cédula es obligatoria`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (user.dni.length < 6 || user.dni.length > 10) {
+            enqueueSnackbar(`La cédula debe tener entre 6 y 10 caracteres`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (!user.phone) {
+            enqueueSnackbar(`El teléfono es obligatorio`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (user.phone.length < 6 || user.phone.length > 15) {
+            enqueueSnackbar(`El teléfono debe tener entre 6 y 15 caracteres`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (!user.place_profession) {
+            enqueueSnackbar(`El lugar de trabajo es obligatorio`, {
+                variant: "error",
+            })
+            return;
+        }
+        if (user.place_profession.length < 3 || user.place_profession.length > 50) {
+            enqueueSnackbar(`El lugar de trabajo debe tener entre 3 y 50 caracteres`, {
+                variant: "error",
+            })
+            return;
+        }
         updateMe(token, user).then(() => {
             enqueueSnackbar(`Se actualizó el usuario`, {
                 variant: "success",
