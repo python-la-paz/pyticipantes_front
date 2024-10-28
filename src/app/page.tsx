@@ -94,6 +94,7 @@ export default function Page() {
                     }
                     <Box
                         sx={{
+                            fontFamily: "'Montserrat Alternates', sans-serif",
                             fontSize: {
                                 xs: "18px",
                                 md: "22px"
@@ -110,6 +111,7 @@ export default function Page() {
                     </Box>
                     <Box
                         sx={{
+                            fontFamily: "'Montserrat Alternates', sans-serif",
                             fontSize: {
                                 xs: '24px',
                                 md: '48px'

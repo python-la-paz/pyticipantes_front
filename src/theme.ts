@@ -1,5 +1,5 @@
 'use client';
-import { createTheme, PaletteOptions } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
     interface Palette {
@@ -34,7 +34,7 @@ const theme = createTheme({
         },
     },
     typography: {
-        fontFamily: '"Poppins", sans-serif', // Fuente sans serif personalizada
+        fontFamily: "'Montserrat Alternates', sans-serif", // Fuente sans serif personalizada
         h1: {
             fontSize: '90px',
             fontWeight: 700,

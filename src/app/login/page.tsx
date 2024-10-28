@@ -11,7 +11,7 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             // Usar el método signIn de NextAuth para iniciar sesión con Google
-            await signIn('google', { callbackUrl: routes.profile });
+            await signIn('google', { callbackUrl: routes.root });
         } catch (error) {
             console.error("Error al iniciar sesión con Google", error);
         }
