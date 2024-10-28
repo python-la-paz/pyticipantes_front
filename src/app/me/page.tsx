@@ -3,7 +3,7 @@ import { accessTokenState } from "@/atoms";
 import { genderQuery, locationQuery, mePageQuery, professionQuery, programmingLanguageQuery } from "@/atoms/selectors";
 import { GenderProps, LocationProps, ProfessionProps, ProgrammingLanguageProps, UserProps, UserSkillProps } from "@/const";
 import { updateMe } from "@/lib/http/user";
-import { Avatar, Button, Chip, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Slider, Stack, TextField, Typography } from "@mui/material";
+import { Avatar, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Slider, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable } from "recoil";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SendIcon from '@mui/icons-material/Send';
+import { useRouter } from "next/navigation";
 
 function MeInfo(props: { user: UserProps, setUser: (value: UserProps) => void, setBirthday: (value: Dayjs) => void, setGender: (value: string) => void, saveUser: () => void }) {
     const genderDetailsLoadable = useRecoilValueLoadable(genderQuery);
@@ -368,6 +369,10 @@ export default function MePage() {
     // const [gender, setGender] = useState('');
     const [token] = useRecoilState(accessTokenState);
     const [user, setUser] = useState<UserProps>(defaultUser);
+    const router = useRouter();
+    const [open, setOpen] = useState(false);
+    const handleClose = () => setOpen(false);
+    const handleRedirect = () => router.push('/');
     const setGender = (value: string) => {
         setUser({ ...user, gender: value });
     }
@@ -376,9 +381,7 @@ export default function MePage() {
     }
     const saveUser = () => {
         updateMe(token, user).then(() => {
-            enqueueSnackbar(`Se actualizó el usuario`, {
-                variant: "success",
-            })
+            setOpen(true);
         }).catch(() => {
             enqueueSnackbar(`Error al actualizar el usuario`, {
                 variant: "error",
@@ -387,6 +390,17 @@ export default function MePage() {
     }
     return (
         <>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Se actualizó el usuario</DialogTitle>
+                <DialogActions>
+                    <Button onClick={handleClose} variant="contained" color="primary">
+                        Volver
+                    </Button>
+                    <Button onClick={handleRedirect} variant="contained" color="secondary">
+                        Finalizar
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Stack direction="column"
                 spacing={0.5}
                 sx={{
