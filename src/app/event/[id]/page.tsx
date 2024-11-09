@@ -20,7 +20,7 @@ import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PaidIcon from '@mui/icons-material/Paid';
 import PublicIcon from '@mui/icons-material/Public';
-import { Accordion, Alert, Box, Button, Chip, Container, Divider, FormControl, Icon, IconButton, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import { Accordion, Alert, Box, Button, Chip, Container, Divider, FormControl, IconButton, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";

@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { URLS } from "./urls";
-import { ActivityProps, EventProps, EventRegisterProps, SocialNetworkProps } from "@/const";
+import { ActivityProps} from "@/const";
 
 export async function fetchActivities(
     page?: number,
