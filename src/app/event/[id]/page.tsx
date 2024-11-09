@@ -4,11 +4,15 @@ import EventRegisterItem from "@/app/components/event.register.item";
 import { accessTokenState, userInfoSelector } from "@/atoms";
 import { socialNetworkQuery } from "@/atoms/selectors";
 import { eventQuery, eventRegisterQuery } from "@/atoms/selectors.event";
-import { EventRegisterProps, SocialNetworkProps } from "@/const";
+import { activitiesQuery} from "@/atoms/selectors.activity";
+import { ActivityProps, EventRegisterProps, SocialNetworkProps } from "@/const";
 import { registerEvent } from "@/lib/http/events";
 import { routes } from "@/lib/urls";
 import { PhotoCamera } from "@mui/icons-material";
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DescriptionIcon from '@mui/icons-material/Description';
 import FaceIcon from '@mui/icons-material/Face';
 import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
@@ -16,7 +20,7 @@ import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PaidIcon from '@mui/icons-material/Paid';
 import PublicIcon from '@mui/icons-material/Public';
-import { Alert, Box, Button, Chip, Container, Divider, FormControl, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import { Accordion, Alert, Box, Button, Chip, Container, Divider, FormControl, Icon, IconButton, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
@@ -25,6 +29,109 @@ import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import AddIcon from '@mui/icons-material/Add';
+
+function ActivityList() {
+    const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
+
+    const handleExpandClick = (id: string, event: React.MouseEvent<SVGSVGElement>) => {
+        event.stopPropagation();
+        setExpandedAccordion((prev) => (prev === id ? null : id));
+    };
+
+    const handlebuton = () =>{
+        alert("hola");
+    }
+    const activities = useRecoilValueLoadable(activitiesQuery);
+    if (activities.state === 'loading') {
+        return <p>Loading...</p>; // No renderizar la lista hasta que los datos estén cargados
+    }
+    if (activities.state === 'hasError') {
+        return <p>Error: {activities.contents}</p>; // Mostrar un mensaje de error si algo salió mal
+    }
+    const data = activities.contents.content;
+    return (
+        <>
+            {
+                data.map((activity: ActivityProps) => (
+                    <Accordion
+                        key = {activity._id}
+                        expanded={expandedAccordion === activity._id }
+                        disableGutters
+                        elevation={0}
+                        sx={{
+                            borderBottom: 'none',
+                            '&:not(:last-child)': {
+                                borderBottom: '1px solid green',
+                            }, 
+                        }}>
+                        <AccordionSummary
+                            aria-controls={`${activity._id}-content`}
+                            id={`${activity._id}-header`}
+                            expandIcon={
+                                <ExpandMoreIcon
+                                    sx={{
+                                        borderRadius: '40px',
+                                        border: '1px solid',
+                                        pointerEvents: "auto"
+                                    }}
+                                    onClick={(event) => handleExpandClick(activity._id, event)}
+                                />
+                            }
+                            sx={{
+                                padding: '0px',
+                                margin: '0px',
+                                pointerEvents: "none"
+                            }}>
+                            <Stack direction="column">
+                                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>{activity.title}</Typography>
+                                <Typography variant="caption">{dayjs(activity.date).format("DD [de] MMMM [de] YYYY HH:mm:ss")}</Typography>
+                            </Stack>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: 'auto' }}>
+                                <IconButton onClick={handlebuton} sx={{ pointerEvents: "auto" }}>
+                                    <AddIcon
+                                        sx={{
+                                            borderRadius: '20px',
+                                            border: '1px solid',
+                                            '::hover': {
+                                                color: 'green',
+                                            }
+                                        }}
+                                    />
+                                </IconButton>
+                            </div>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Stack direction={{ xs: "column", md: "row" }}>
+                                <Box sx={{ flex: 1, padding: 2, height: 200 }}>
+                                    <img
+                                        src={activity.image?.url}
+                                        alt="Imagen 2"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '40px' }}
+                                    />
+                                </Box>
+                                <Box sx={{ flex: 1, padding: 2, height: 200 }}>
+                                    <Stack direction="column">
+                                        <Typography>
+                                            {activity.description}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                            Presentado por: {activity.organizers?.join(", ")}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                            Donde: {activity.location}
+                                        </Typography>
+                                        {activity.link && <Chip size="small" icon={<PublicIcon />} label="Enlace" variant="filled" color="primary" onClick={() => window.open(activity.link, '_blank')} />}
+                                    </Stack>
+                                </Box>
+                            </Stack>
+                        </AccordionDetails>
+                    </Accordion>
+                ))}
+        </>
+    );
+}
+
 export default function Page({ params }: { params: { id: string } }) {
     const [token] = useRecoilState(accessTokenState);
     const { enqueueSnackbar } = useSnackbar();
@@ -171,6 +278,10 @@ export default function Page({ params }: { params: { id: string } }) {
                             <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{"Organizado por:"}</Typography>
                                 <Typography variant="caption">{event.organizers.join(", ")}</Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                                <Typography variant="subtitle1" sx={{fontWeight: 'bold'}}>{"Elige las actividades que te interesan"}</Typography>
+                                <ActivityList/>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
                                 {
