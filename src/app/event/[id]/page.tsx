@@ -12,7 +12,6 @@ import { routes } from "@/lib/urls";
 import { PhotoCamera } from "@mui/icons-material";
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import BlockIcon from '@mui/icons-material/Block';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -22,6 +21,7 @@ import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PaidIcon from '@mui/icons-material/Paid';
 import PublicIcon from '@mui/icons-material/Public';
+import RemoveIcon from '@mui/icons-material/Remove';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { Accordion, Alert, Box, Button, Chip, Container, Divider, FormControl, IconButton, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -35,10 +35,10 @@ import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 
-function ActivityList({ params, registersNoRejected, registersActivity, registersActivityNoRejected }: { params: { id: string }, registersNoRejected: EventRegisterProps[], registersActivity: ActivityRegisterProps[], registersActivityNoRejected: ActivityRegisterProps[] }) {
+function ActivityList({ params, registersNoRejected,  registersActivityNoRejected }: { params: { id: string }, registersNoRejected: EventRegisterProps[], registersActivityNoRejected: ActivityRegisterProps[] }) {
     const { enqueueSnackbar } = useSnackbar();
     const [token] = useRecoilState(accessTokenState);
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
     const refreshUserInfo = useSetRecoilState(userInfoSelector);
     const handleExpandClick = (id: string, event: React.MouseEvent<SVGSVGElement>) => {
@@ -219,7 +219,6 @@ export default function Page({ params }: { params: { id: string } }) {
     const refreshUserInfo = useSetRecoilState(userInfoSelector);
     const [registers, setRegisters] = useState<EventRegisterProps[]>([]);
     const [registersNoRejected, setRegistersNoRejected] = useState<EventRegisterProps[]>([]);
-    const [registersActivity, setRegistersActivity] = useState<ActivityRegisterProps[]>([]);
     const [registersActivityNoRejected, setRegistersActivityNoRejected] = useState<ActivityRegisterProps[]>([]);
     const socialNetworksLoadable = useRecoilValueLoadable(socialNetworkQuery);
     const [socialNetworks, setSocialNetworks] = useState<SocialNetworkProps[]>([]);
@@ -292,7 +291,6 @@ export default function Page({ params }: { params: { id: string } }) {
     useEffect(() => {
         if (status === "authenticated") {
             if (registrationActivityLoadable.state === "hasValue") {
-                setRegistersActivity(registrationActivityLoadable.contents.content);
                 setRegistersActivityNoRejected(registrationActivityLoadable.contents.content.filter((register: ActivityRegisterProps) => register.status !== "rejected"));
             }
         }
@@ -403,7 +401,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     </Box>
                 </Grid>
                 <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
-                    <ActivityList params={params} registersNoRejected={registersNoRejected} registersActivity={registersActivity} registersActivityNoRejected={registersActivityNoRejected} />
+                    <ActivityList params={params} registersNoRejected={registersNoRejected} registersActivityNoRejected={registersActivityNoRejected} />
                 </Grid>
                 <Divider variant='inset' />
                 {registers.length > 0 && (

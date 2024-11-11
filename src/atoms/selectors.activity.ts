@@ -1,7 +1,7 @@
-import { accessTokenState, activityPageState, userInfoSelector} from "@/atoms";
+import { accessTokenState, userInfoSelector } from "@/atoms";
 import { ActivityRegisterProps } from "@/const";
 import { fetchActivities, fetchActivityRegister } from "@/lib/http/activities";
-import { selector, selectorFamily} from "recoil";
+import { selectorFamily } from "recoil";
 
 export const activitiesQuery = selectorFamily({
     key: "activitiesQuery",
