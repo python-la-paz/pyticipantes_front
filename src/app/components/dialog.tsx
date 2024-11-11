@@ -49,7 +49,7 @@ export default function FullScreenDialog({ children, props }: {
                 onClose={handleClose}
                 TransitionComponent={Transition}
             >
-                <AppBar sx={{ position: 'relative' }}>
+                <AppBar sx={{ position: 'fixed' }}>
                     <Toolbar>
                         <IconButton
                             edge="start"
@@ -69,7 +69,8 @@ export default function FullScreenDialog({ children, props }: {
                 </AppBar>
                 <Box sx={{
                     height: '100vh',
-                    margin: 'auto', padding: '10px'
+                    margin: 'auto', padding: '10px',
+                    mt: 8
                 }}>
                     {children}
                 </Box>

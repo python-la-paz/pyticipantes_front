@@ -1,16 +1,31 @@
-import { activityPageState} from "@/atoms";
-import { fetchActivities } from "@/lib/http/activities";
-import { selector} from "recoil";
+import { accessTokenState, activityPageState, userInfoSelector} from "@/atoms";
+import { ActivityRegisterProps } from "@/const";
+import { fetchActivities, fetchActivityRegister } from "@/lib/http/activities";
+import { selector, selectorFamily} from "recoil";
 
-export const activitiesQuery = selector({
+export const activitiesQuery = selectorFamily({
     key: "activitiesQuery",
-    get: async ({ get }) => {
-        const { page, size } = get(activityPageState);
-        const response = await fetchActivities(page, size);
+    get: (param: { id: string }) => async ({ get }) => {
+        get(userInfoSelector);
+        const response = await fetchActivities(param.id);
         if (response.error) {
             throw response.error;
         }
-        console.log(response);
         return response;
+    },
+});
+export const activityRegisterQuery = selectorFamily({
+    key: "activityRegisterQuery",
+    get: (param: { id: string }) => async ({ get }) => {
+        get(userInfoSelector);
+        const at = get(accessTokenState);
+        if (param.id !== "") {
+            const response = await fetchActivityRegister(param.id, at);
+            if (response.error) {
+                throw response.error;
+            }
+            return response;
+        }
+        return { content: [] as ActivityRegisterProps[] }
     },
 });

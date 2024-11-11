@@ -12,8 +12,8 @@ class URLS {
     static readonly LOCATION = '/public/location'
     static readonly PROGRAMMING_LANGUAGE = '/public/programminglanguage'
     static readonly SOCIAL_NETWORK = '/public/socialnetwork'
-    static readonly ACTIVITIES = '/public/activity'
-    static readonly ACTIVITY = '/public/activity/{id}'
+    static readonly ACTIVITIES = '/public/event/{id}/activity'
+    static readonly ACTIVITIES_REGISTER = '/public/event/{id}/activity/register'
     static readonly ACTIVITY_REGISTER = '/public/activity/{id}/register'
 }
 export { URLS };

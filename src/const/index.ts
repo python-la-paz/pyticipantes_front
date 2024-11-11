@@ -109,7 +109,7 @@ export type SocialNetworkProps = {
 };
 
 export type ActivityProps = {
-    evento: string;
+    event: string;
     title: string;
     description: string;
     date: Date;
@@ -121,7 +121,7 @@ export type ActivityProps = {
     link?: string;
     link_text?: string;
     public?: boolean;
-    quota?: number;
+    quota: number;
     price?: number;
     currency?: string;
     finished?: boolean;
@@ -130,6 +130,7 @@ export type ActivityProps = {
     additional_info?: string[];
     document_required?: boolean;
     automatic?: boolean;
+    is_full: boolean;
     _id: string;
 }
 
