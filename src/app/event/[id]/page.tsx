@@ -3,20 +3,29 @@ import FullScreenDialog from "@/app/components/dialog";
 import EventRegisterItem from "@/app/components/event.register.item";
 import { accessTokenState, userInfoSelector } from "@/atoms";
 import { socialNetworkQuery } from "@/atoms/selectors";
+import { activitiesQuery, activityRegisterQuery } from "@/atoms/selectors.activity";
 import { eventQuery, eventRegisterQuery } from "@/atoms/selectors.event";
-import { EventRegisterProps, SocialNetworkProps } from "@/const";
+import { ActivityProps, ActivityRegisterProps, EventRegisterProps, SocialNetworkProps } from "@/const";
+import { deleteRegisterActivity, registerActivity } from "@/lib/http/activities";
 import { registerEvent } from "@/lib/http/events";
 import { routes } from "@/lib/urls";
 import { PhotoCamera } from "@mui/icons-material";
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import AddIcon from '@mui/icons-material/Add';
+import BlockIcon from '@mui/icons-material/Block';
 import DescriptionIcon from '@mui/icons-material/Description';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FaceIcon from '@mui/icons-material/Face';
 import HourglassDisabledIcon from '@mui/icons-material/HourglassDisabled';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PaidIcon from '@mui/icons-material/Paid';
 import PublicIcon from '@mui/icons-material/Public';
-import { Alert, Box, Button, Chip, Container, Divider, FormControl, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import RemoveIcon from '@mui/icons-material/Remove';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import { Accordion, Alert, Box, Button, Chip, Container, Divider, FormControl, IconButton, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
@@ -25,6 +34,178 @@ import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
+
+function ActivityList({ params, registersNoRejected,  registersActivityNoRejected }: { params: { id: string }, registersNoRejected: EventRegisterProps[], registersActivityNoRejected: ActivityRegisterProps[] }) {
+    const { enqueueSnackbar } = useSnackbar();
+    const [token] = useRecoilState(accessTokenState);
+    const { data: session } = useSession();
+    const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
+    const refreshUserInfo = useSetRecoilState(userInfoSelector);
+    const handleExpandClick = (id: string, event: React.MouseEvent<SVGSVGElement>) => {
+        event.stopPropagation();
+        setExpandedAccordion((prev) => (prev === id ? null : id));
+    };
+
+    const handleButtonDirect = (activity: ActivityProps, is_delete: boolean = false) => {
+        if (is_delete) {
+            deleteRegisterActivity(activity._id, token).then((response) => {
+                if (response.error) {
+                    enqueueSnackbar(response.message, { variant: "error" });
+                    return;
+                }
+                enqueueSnackbar(response.message, { variant: "success" });
+                refreshUserInfo((oldValue) => oldValue + 1);
+                // reload data from server
+
+            }).catch((error) => {
+                enqueueSnackbar(`Error al registrar ${error}`, { variant: "error" });
+            });
+            return;
+        }
+        registerActivity(activity._id, token, null, []).then((response) => {
+            if (response.error) {
+                enqueueSnackbar(response.message, { variant: "error" });
+                return;
+            }
+            enqueueSnackbar(response.message, { variant: "success" });
+            refreshUserInfo((oldValue) => oldValue + 1);
+            // reload data from server
+
+        }).catch((error) => {
+            enqueueSnackbar(`Error al registrar ${error}`, { variant: "error" });
+        });
+    }
+    const activities = useRecoilValueLoadable(activitiesQuery({ id: params.id }));
+    if (activities.state === 'loading') {
+        return <p>Loading...</p>; // No renderizar la lista hasta que los datos estén cargados
+    }
+    if (activities.state === 'hasError') {
+        return <p>Error: {activities.contents}</p>; // Mostrar un mensaje de error si algo salió mal
+    }
+    const data = activities.contents.content;
+
+    return (
+        <>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{"Elige las actividades que te interesan"}</Typography>
+            {
+                data.map((activity: ActivityProps) => (
+                    <Accordion
+                        key={activity._id}
+                        expanded={expandedAccordion === activity._id}
+                        disableGutters
+                        elevation={0}
+                        sx={{
+                            borderBottom: 'none',
+                            '&:not(:last-child)': {
+                                borderBottom: '1px solid green',
+                            },
+                        }}>
+                        <AccordionSummary
+                            aria-controls={`${activity._id}-content`}
+                            id={`${activity._id}-header`}
+                            expandIcon={
+                                <ExpandMoreIcon
+                                    sx={{
+                                        borderRadius: '40px',
+                                        border: '1px solid',
+                                        pointerEvents: "auto"
+                                    }}
+                                    onClick={(event) => handleExpandClick(activity._id, event)}
+                                />
+                            }
+                            sx={{
+                                padding: '0px',
+                                margin: '0px',
+                                pointerEvents: "none"
+                            }}>
+                            <Stack direction="column">
+                                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                    {activity.title}&nbsp;<Chip size="small" icon={<FaceIcon />} label={activity.quota > 0 ? `${activity.quota}` : `Ilimitados`} variant="outlined" />
+
+                                </Typography>
+                                <Typography variant="caption">
+                                    {dayjs(activity.date).format("DD/MM/YYYY")}
+
+                                </Typography>
+                            </Stack>
+                            {session && registersNoRejected.length > 0 &&
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: 'auto' }}>
+                                    <IconButton onClick={() => handleButtonDirect(activity,
+                                        (registersActivityNoRejected.length > 0 &&
+                                            registersActivityNoRejected.find((register: ActivityRegisterProps) => register.activity === activity._id) !== undefined
+                                        )
+                                    )} sx={{ pointerEvents: "auto" }}
+                                        disabled={activity.is_full}>
+                                        {
+                                            (registersActivityNoRejected.length > 0
+                                                && registersActivityNoRejected.find((register: ActivityRegisterProps) => register.activity === activity._id) !== undefined
+                                            ) ?
+                                                <RemoveIcon color="secondary" fontSize="inherit" sx={{
+                                                    borderRadius: '20px',
+                                                    border: '1px solid',
+                                                    '::hover': {
+                                                        color: 'red',
+                                                    }
+                                                }} />
+                                                :
+                                                <>
+                                                    {
+                                                        activity.is_full ?
+                                                            <BlockIcon fontSize="inherit" sx={{
+                                                                borderRadius: '20px',
+                                                                border: '1px solid',
+                                                            }} />
+                                                            :
+                                                            <AddIcon color="primary" fontSize="inherit" sx={{
+                                                                borderRadius: '20px',
+                                                                border: '1px solid',
+                                                                '::hover': {
+                                                                    color: 'green',
+                                                                }
+                                                            }} />
+                                                    }
+                                                </>
+                                        }
+                                    </IconButton>
+                                </div>
+                            }
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Stack direction={{ xs: "column", md: "row" }}>
+                                <Box sx={{ flex: 1, padding: 2 }} textAlign={"center"}>
+                                    {activity.image ?
+                                        <Image src={activity.image?.url} alt={activity.title} width={150} height={150} sizes="50vw"
+                                            style={{
+                                                width: '70%',
+                                                height: 'auto',
+                                            }} />
+                                        : null}
+
+                                </Box>
+                                <Box sx={{ flex: 1, padding: 2 }}>
+                                    <Stack direction="column" spacing={1} >
+                                        <Typography>
+                                            {activity.description}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                            <SupervisorAccountIcon color="primary" fontSize="inherit" /> {activity.organizers?.join(", ")}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                            <LocationOnIcon color="primary" fontSize="inherit" /> {activity.location}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                                            {activity.link && <Chip size="small" icon={<PublicIcon />} label={activity.link_text || ""} variant="filled" color="primary" onClick={() => window.open(activity.link, '_blank')} />}
+                                        </Typography>
+                                    </Stack>
+                                </Box>
+                            </Stack>
+                        </AccordionDetails>
+                    </Accordion>
+                ))}
+        </>
+    );
+}
+
 export default function Page({ params }: { params: { id: string } }) {
     const [token] = useRecoilState(accessTokenState);
     const { enqueueSnackbar } = useSnackbar();
@@ -34,9 +215,11 @@ export default function Page({ params }: { params: { id: string } }) {
     const [additionalInfoResponses, setAdditionalInfoResponses] = useState<string[]>([]);
     const eventLoadable = useRecoilValueLoadable(eventQuery(params.id));
     const registrationLoadable = useRecoilValueLoadable(eventRegisterQuery({ id: params.id }));
+    const registrationActivityLoadable = useRecoilValueLoadable(activityRegisterQuery({ id: params.id }));
     const refreshUserInfo = useSetRecoilState(userInfoSelector);
     const [registers, setRegisters] = useState<EventRegisterProps[]>([]);
     const [registersNoRejected, setRegistersNoRejected] = useState<EventRegisterProps[]>([]);
+    const [registersActivityNoRejected, setRegistersActivityNoRejected] = useState<ActivityRegisterProps[]>([]);
     const socialNetworksLoadable = useRecoilValueLoadable(socialNetworkQuery);
     const [socialNetworks, setSocialNetworks] = useState<SocialNetworkProps[]>([]);
     const [actualSocialNetwork, setActualSocialNetwork] = useState<string>("");
@@ -105,6 +288,13 @@ export default function Page({ params }: { params: { id: string } }) {
             }
         }
     }, [status, registrationLoadable]);
+    useEffect(() => {
+        if (status === "authenticated") {
+            if (registrationActivityLoadable.state === "hasValue") {
+                setRegistersActivityNoRejected(registrationActivityLoadable.contents.content.filter((register: ActivityRegisterProps) => register.status !== "rejected"));
+            }
+        }
+    }, [status, registrationActivityLoadable]);
     useEffect(() => {
         if (socialNetworksLoadable.state === "hasValue") {
             setSocialNetworks(socialNetworksLoadable.contents.content);
@@ -209,6 +399,9 @@ export default function Page({ params }: { params: { id: string } }) {
                             )}
                         </Grid>
                     </Box>
+                </Grid>
+                <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    <ActivityList params={params} registersNoRejected={registersNoRejected} registersActivityNoRejected={registersActivityNoRejected} />
                 </Grid>
                 <Divider variant='inset' />
                 {registers.length > 0 && (

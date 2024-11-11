@@ -107,3 +107,41 @@ export type SocialNetworkProps = {
     name: string;
     _id: string;
 };
+
+export type ActivityProps = {
+    event: string;
+    title: string;
+    description: string;
+    date: Date;
+    location: string;
+    location_map?: string;
+    image?: FileBlobProps;
+    document?: string;
+    document_type?: string;
+    link?: string;
+    link_text?: string;
+    public?: boolean;
+    quota: number;
+    price?: number;
+    currency?: string;
+    finished?: boolean;
+    tags?: string[];
+    organizers?: string[];
+    additional_info?: string[];
+    document_required?: boolean;
+    automatic?: boolean;
+    is_full: boolean;
+    _id: string;
+}
+
+export type ActivityRegisterProps = {
+    activity: string;
+    user: string;
+    date: Date;
+    seat?: number;
+    status?: string;
+    note?: string;
+    document_upload?: FileBlobProps;
+    additional_info?: string[];
+    _id: string;
+}

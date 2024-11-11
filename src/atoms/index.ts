@@ -20,3 +20,7 @@ export const userInfoSelector = atom({
     key: "UserInfoSelector",
     default: 0,
 });
+export const activityPageState = atom({
+    key: "EventPageState",
+    default: { page: 1, size: 1000 },
+})

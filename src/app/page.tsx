@@ -10,10 +10,10 @@ import { useEffect, useState } from 'react';
 function EventList() {
     const events = useRecoilValueLoadable(eventsQuery);
     if (events.state === 'loading') {
-        return <p>Loading...</p>; // No renderizar la lista hasta que los datos estén cargados
+        return <p>Loading...</p>;
     }
     if (events.state === 'hasError') {
-        return <p>Error: {events.contents}</p>; // Mostrar un mensaje de error si algo salió mal
+        return <p>Error: {events.contents}</p>;
     }
     const data = events.contents.content;
     return (
