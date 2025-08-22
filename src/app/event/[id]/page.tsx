@@ -35,7 +35,7 @@ import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 
-function ActivityList({ params, registersNoRejected,  registersActivityNoRejected }: { params: { id: string }, registersNoRejected: EventRegisterProps[], registersActivityNoRejected: ActivityRegisterProps[] }) {
+function ActivityList({ params, registersNoRejected, registersActivityNoRejected }: { params: { id: string }, registersNoRejected: EventRegisterProps[], registersActivityNoRejected: ActivityRegisterProps[] }) {
     const { enqueueSnackbar } = useSnackbar();
     const [token] = useRecoilState(accessTokenState);
     const { data: session } = useSession();
@@ -336,7 +336,9 @@ export default function Page({ params }: { params: { id: string } }) {
                                 <Typography variant="caption">{event.finished ? "Finalizado" : "Activo"}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
-                                <Typography variant="body2">{event.description}</Typography>
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                                    {event.description}
+                                </Typography>
                                 <Typography variant="caption" sx={{ fontWeight: 'light' }} >{event.tags.join(", ")}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
@@ -368,7 +370,7 @@ export default function Page({ params }: { params: { id: string } }) {
                                         <Stack spacing={1}>
                                             <Alert severity="info" variant="outlined" >Preguntas adicionales</Alert>
                                             {event.additional_info.map((info: string, index: number) => (
-                                                <Typography key={info} variant="overline"><b>{index + 1}.</b> {info}</Typography>
+                                                <Typography key={info} variant="overline" sx={{ whiteSpace: 'pre-line' }}><b>{index + 1}.</b> {info}</Typography>
                                             ))
                                             }
                                         </Stack>
@@ -453,7 +455,7 @@ export default function Page({ params }: { params: { id: string } }) {
                         )}
                         {event.additional_info && event.additional_info.map((info: string, index: number) => (
                             <Grid size={12} key={info}>
-                                <Typography variant="overline"><b>{index + 1}.</b> {info}</Typography>
+                                <Typography variant="overline" sx={{ whiteSpace: 'pre-line' }}><b>{index + 1}.</b> {info}</Typography>
                                 <TextField variant="outlined" fullWidth onChange={handleAdditionalInfoChange} id={index.toString()} />
                             </Grid>
                         ))}
