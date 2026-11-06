@@ -48,6 +48,20 @@ export type ProfessionProps = {
     name: string;
 };
 
+export type AdditionalInfoType = "text" | "multiple" | "single";
+
+export type AdditionalInfoQuestionProps = {
+    question: string;
+    type: AdditionalInfoType;
+    options: string[];
+};
+
+export type AdditionalInfoAnswerProps = {
+    question: string;
+    type: AdditionalInfoType;
+    answer: string | string[];
+};
+
 export type EventProps = {
     title: string;
     description: string;
@@ -66,7 +80,7 @@ export type EventProps = {
     finished?: boolean;
     tags: string[];
     organizers: string[];
-    additional_info: string[];
+    additional_info: AdditionalInfoQuestionProps[];
     document_required?: boolean;
     automatic?: boolean;
     registration_start?: Date | null;
@@ -84,7 +98,7 @@ export type EventRegisterProps = {
     status?: string;
     note?: string;
     document_upload: FileBlobProps | null;
-    additional_info?: string[];
+    additional_info?: AdditionalInfoAnswerProps[];
     _id: string;
 };
 
@@ -129,7 +143,7 @@ export type ActivityProps = {
     finished?: boolean;
     tags?: string[];
     organizers?: string[];
-    additional_info?: string[];
+    additional_info?: AdditionalInfoQuestionProps[];
     document_required?: boolean;
     automatic?: boolean;
     registration_start?: Date | null;
@@ -146,6 +160,6 @@ export type ActivityRegisterProps = {
     status?: string;
     note?: string;
     document_upload?: FileBlobProps;
-    additional_info?: string[];
+    additional_info?: AdditionalInfoAnswerProps[];
     _id: string;
 }
