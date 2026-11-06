@@ -69,6 +69,8 @@ export type EventProps = {
     additional_info: string[];
     document_required?: boolean;
     automatic?: boolean;
+    registration_start?: Date | null;
+    registration_end?: Date | null;
     _id: string;
 };
 
@@ -130,6 +132,8 @@ export type ActivityProps = {
     additional_info?: string[];
     document_required?: boolean;
     automatic?: boolean;
+    registration_start?: Date | null;
+    registration_end?: Date | null;
     is_full: boolean;
     _id: string;
 }

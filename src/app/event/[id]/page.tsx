@@ -12,6 +12,8 @@ import { routes } from "@/lib/urls";
 import { PhotoCamera } from "@mui/icons-material";
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import AddIcon from '@mui/icons-material/Add';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import BlockIcon from '@mui/icons-material/Block';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -127,6 +129,12 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
                                     {dayjs(activity.date).format("DD/MM/YYYY")}
 
                                 </Typography>
+                                {(activity.registration_start || activity.registration_end) &&
+                                    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
+                                        {activity.registration_start && <Chip size="small" icon={<EventAvailableIcon />} label={`Inicio registro: ${dayjs(activity.registration_start).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
+                                        {activity.registration_end && <Chip size="small" icon={<EventBusyIcon />} label={`Fin registro: ${dayjs(activity.registration_end).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
+                                    </Stack>
+                                }
                             </Stack>
                             {session && registersNoRejected.length > 0 &&
                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: 'auto' }}>
@@ -345,6 +353,8 @@ export default function Page({ params }: { params: { id: string } }) {
                                 <Stack direction="row" spacing={1} useFlexGap
                                     sx={{ flexWrap: 'wrap' }}>
                                     <Chip size="small" icon={<AccessTimeFilledIcon />} label={dayjs(event.date).format("DD/MM/YYYY")} variant="outlined" />
+                                    {event.registration_start && <Chip size="small" icon={<EventAvailableIcon />} label={`Inicio registro: ${dayjs(event.registration_start).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
+                                    {event.registration_end && <Chip size="small" icon={<EventBusyIcon />} label={`Cierre registro: ${dayjs(event.registration_end).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
                                     <Chip size="small" icon={<FaceIcon />} label={event.quota > 0 ? `Cupos: ${event.quota}` : `Cupos: Ilimitados`} color="primary" variant="outlined" />
                                     <Chip size="small" icon={<PaidIcon />} label={event.price ? `${event.price} ${event.currency}` : "Gratuito"} color="secondary" variant="outlined" />
                                     {!event.location_map ? <Chip size="small" icon={<LocationOnIcon />} label={event.location} variant="outlined" />
