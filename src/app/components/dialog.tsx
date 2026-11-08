@@ -4,6 +4,7 @@ import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
 import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions';
@@ -62,7 +63,7 @@ export default function FullScreenDialog({ children, props }: {
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                             {props.title}
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleSave}>
+                        <Button autoFocus color="secondary" variant="contained" onClick={handleSave} endIcon={<SendIcon />}>
                             {props.saveText || 'Guardar'}
                         </Button>
                     </Toolbar>

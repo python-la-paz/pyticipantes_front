@@ -43,6 +43,10 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
     const { data: session } = useSession();
     const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
     const refreshUserInfo = useSetRecoilState(userInfoSelector);
+    const [activityDialogOpen, setActivityDialogOpen] = useState(false);
+    const [selectedActivity, setSelectedActivity] = useState<ActivityProps | null>(null);
+    const [activityFile, setActivityFile] = useState<File | null>(null);
+    const [activityAdditionalInfoResponses, setActivityAdditionalInfoResponses] = useState<Record<number, string | string[]>>({});
     const handleExpandClick = (id: string, event: React.MouseEvent<SVGSVGElement>) => {
         event.stopPropagation();
         setExpandedAccordion((prev) => (prev === id ? null : id));
@@ -64,14 +68,57 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
             });
             return;
         }
-        registerActivity(activity._id, token, null, []).then((response) => {
+        setSelectedActivity(activity);
+        setActivityFile(null);
+        setActivityAdditionalInfoResponses({});
+        setActivityDialogOpen(true);
+    }
+
+    const handleActivityAdditionalInfoChange = (index: number, value: string) => {
+        setActivityAdditionalInfoResponses((prev) => ({ ...prev, [index]: value }));
+    };
+
+    const handleActivityAdditionalInfoToggle = (index: number, option: string, checked: boolean) => {
+        setActivityAdditionalInfoResponses((prev) => {
+            const current = Array.isArray(prev[index]) ? prev[index] : [];
+            const next = checked ? [...current, option] : current.filter((value) => value !== option);
+            return { ...prev, [index]: next };
+        });
+    };
+
+    const handleActivitySave = () => {
+        if (!selectedActivity) return;
+        if (selectedActivity.document_required && !activityFile) {
+            enqueueSnackbar("Se requiere subir un documento", { variant: "error" });
+            return;
+        }
+
+        const questions = selectedActivity.additional_info || [];
+        const answers: AdditionalInfoAnswerProps[] = [];
+        for (let index = 0; index < questions.length; index++) {
+            const question = questions[index];
+            const raw = activityAdditionalInfoResponses[index];
+            const answer = question.type === "multiple"
+                ? (Array.isArray(raw) ? raw : [])
+                : (typeof raw === "string" ? raw.trim() : "");
+            if (answer.length === 0) {
+                enqueueSnackbar(`Por favor responda la pregunta ${index + 1}`, { variant: "error" });
+                return;
+            }
+            answers.push({ question: question.question, type: question.type, answer });
+        }
+
+        registerActivity(selectedActivity._id, token, activityFile, answers).then((response) => {
             if (response.error) {
                 enqueueSnackbar(response.message, { variant: "error" });
                 return;
             }
             enqueueSnackbar(response.message, { variant: "success" });
+            setActivityDialogOpen(false);
+            setSelectedActivity(null);
+            setActivityAdditionalInfoResponses({});
+            setActivityFile(null);
             refreshUserInfo((oldValue) => oldValue + 1);
-            // reload data from server
 
         }).catch((error) => {
             enqueueSnackbar(`Error al registrar ${error}`, { variant: "error" });
@@ -204,12 +251,78 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
                                         <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                                             {activity.link && <Chip size="small" icon={<PublicIcon />} label={activity.link_text || ""} variant="filled" color="primary" onClick={() => window.open(activity.link, '_blank')} />}
                                         </Typography>
+                                        {registersActivityNoRejected.find((register) => register.activity === activity._id)?.additional_info?.length ? (
+                                            <Stack spacing={0.5}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>Tus respuestas</Typography>
+                                                {registersActivityNoRejected.find((register) => register.activity === activity._id)?.additional_info?.map((answer, index) => (
+                                                    <Typography key={index} variant="body2">
+                                                        {activity.additional_info?.[index]?.question && <><b>{activity.additional_info[index].question}:</b> </>}
+                                                        {Array.isArray(answer) ? answer.join(", ") : answer}
+                                                    </Typography>
+                                                ))}
+                                            </Stack>
+                                        ) : null}
                                     </Stack>
                                 </Box>
                             </Stack>
                         </AccordionDetails>
                     </Accordion>
                 ))}
+            <FullScreenDialog props={{
+                title: "",
+                open: activityDialogOpen,
+                closeFunction: () => setActivityDialogOpen(false),
+                saveFunction: handleActivitySave,
+                saveText: "Registrarse",
+            }}>
+                {selectedActivity && (
+                    <Container>
+                        <Typography variant="h5" sx={{ fontWeight: "medium" }}>Registro a {selectedActivity.title}</Typography>
+                        <Grid container spacing={3} sx={{ mt: 1 }}>
+                            {selectedActivity.document_required && (
+                                <Grid size={12}>
+                                    <Typography variant="h6" sx={{ fontWeight: "light" }}>Subir documento requerido</Typography>
+                                    <Button fullWidth color="secondary" variant="outlined" component="label" endIcon={<PhotoCamera />}>
+                                        Seleccionar archivo
+                                        <input hidden accept="image/avif,image/gif,image/jpeg,image/png,image/web,image/svg,image/svg+xml,application/pdf,application/msword"
+                                            type="file" onChange={(event) => setActivityFile(event.target.files?.[0] || null)} />
+                                    </Button>
+                                    <Typography>{activityFile?.name || "No se ha seleccionado ningún archivo"}</Typography>
+                                </Grid>
+                            )}
+                            {selectedActivity.additional_info?.map((question, index) => (
+                                <Grid size={12} key={`${index}-${question.question}`}>
+                                    <FormControl fullWidth>
+                                        <FormLabel sx={{ whiteSpace: "pre-line" }}><b>{index + 1}.</b> {question.question}</FormLabel>
+                                        {question.type === "multiple" ? (
+                                            <FormGroup>
+                                                {question.options.map((option) => (
+                                                    <FormControlLabel key={option} label={option}
+                                                        control={<Checkbox
+                                                            checked={Array.isArray(activityAdditionalInfoResponses[index]) && activityAdditionalInfoResponses[index].includes(option)}
+                                                            onChange={(event) => handleActivityAdditionalInfoToggle(index, option, event.target.checked)} />} />
+                                                ))}
+                                            </FormGroup>
+                                        ) : question.type === "single" ? (
+                                            <RadioGroup
+                                                value={typeof activityAdditionalInfoResponses[index] === "string" ? activityAdditionalInfoResponses[index] : ""}
+                                                onChange={(event) => handleActivityAdditionalInfoChange(index, event.target.value)}>
+                                                {question.options.map((option) => (
+                                                    <FormControlLabel key={option} value={option} label={option} control={<Radio />} />
+                                                ))}
+                                            </RadioGroup>
+                                        ) : (
+                                            <TextField fullWidth variant="outlined"
+                                                value={typeof activityAdditionalInfoResponses[index] === "string" ? activityAdditionalInfoResponses[index] : ""}
+                                                onChange={(event) => handleActivityAdditionalInfoChange(index, event.target.value)} />
+                                        )}
+                                    </FormControl>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Container>
+                )}
+            </FullScreenDialog>
         </>
     );
 }

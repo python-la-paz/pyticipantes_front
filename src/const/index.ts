@@ -62,6 +62,8 @@ export type AdditionalInfoAnswerProps = {
     answer: string | string[];
 };
 
+export type AdditionalInfoValueProps = string | string[];
+
 export type EventProps = {
     title: string;
     description: string;
@@ -98,7 +100,7 @@ export type EventRegisterProps = {
     status?: string;
     note?: string;
     document_upload: FileBlobProps | null;
-    additional_info?: AdditionalInfoAnswerProps[];
+    additional_info?: AdditionalInfoValueProps[];
     _id: string;
 };
 
@@ -160,6 +162,6 @@ export type ActivityRegisterProps = {
     status?: string;
     note?: string;
     document_upload?: FileBlobProps;
-    additional_info?: AdditionalInfoAnswerProps[];
+    additional_info?: AdditionalInfoValueProps[];
     _id: string;
 }
