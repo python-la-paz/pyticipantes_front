@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
 import { URLS } from "./urls";
-import { EventProps, EventRegisterProps, SocialNetworkProps } from "@/const";
+import { AdditionalInfoAnswerProps, EventProps, EventRegisterProps, SocialNetworkProps } from "@/const";
 export async function fetchEvents(
     page?: number,
     size?: number,
@@ -69,7 +69,7 @@ export async function registerEvent(
     id: string,
     access_token: string,
     file: any,
-    additionalInfo: string[],
+    additionalInfo: AdditionalInfoAnswerProps[],
     rrss: string,
 ): Promise<{
     content: EventRegisterProps;
@@ -83,7 +83,7 @@ export async function registerEvent(
         if (file && file.name !== "")
             formData.append("file", file, file.name);
         additionalInfo.forEach((info) => {
-            formData.append("additional_info", info);
+            formData.append("additional_info", JSON.stringify(info));
         });
         formData.append("rrss", rrss);
         const response = await axios.post(url, formData, { "headers": { "Authorization": `Bearer ${access_token}` } });

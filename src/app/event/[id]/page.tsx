@@ -5,13 +5,15 @@ import { accessTokenState, userInfoSelector } from "@/atoms";
 import { socialNetworkQuery } from "@/atoms/selectors";
 import { activitiesQuery, activityRegisterQuery } from "@/atoms/selectors.activity";
 import { eventQuery, eventRegisterQuery } from "@/atoms/selectors.event";
-import { ActivityProps, ActivityRegisterProps, EventRegisterProps, SocialNetworkProps } from "@/const";
+import { ActivityProps, ActivityRegisterProps, AdditionalInfoAnswerProps, AdditionalInfoQuestionProps, EventRegisterProps, SocialNetworkProps } from "@/const";
 import { deleteRegisterActivity, registerActivity } from "@/lib/http/activities";
 import { registerEvent } from "@/lib/http/events";
 import { routes } from "@/lib/urls";
 import { PhotoCamera } from "@mui/icons-material";
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import AddIcon from '@mui/icons-material/Add';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import BlockIcon from '@mui/icons-material/Block';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -23,7 +25,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import PublicIcon from '@mui/icons-material/Public';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import { Accordion, Alert, Box, Button, Chip, Container, Divider, FormControl, IconButton, InputLabel, List, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import { Accordion, Alert, Box, Button, Checkbox, Chip, Container, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, IconButton, InputLabel, List, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Grid from "@mui/material/Grid2";
@@ -41,6 +43,10 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
     const { data: session } = useSession();
     const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
     const refreshUserInfo = useSetRecoilState(userInfoSelector);
+    const [activityDialogOpen, setActivityDialogOpen] = useState(false);
+    const [selectedActivity, setSelectedActivity] = useState<ActivityProps | null>(null);
+    const [activityFile, setActivityFile] = useState<File | null>(null);
+    const [activityAdditionalInfoResponses, setActivityAdditionalInfoResponses] = useState<Record<number, string | string[]>>({});
     const handleExpandClick = (id: string, event: React.MouseEvent<SVGSVGElement>) => {
         event.stopPropagation();
         setExpandedAccordion((prev) => (prev === id ? null : id));
@@ -62,14 +68,57 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
             });
             return;
         }
-        registerActivity(activity._id, token, null, []).then((response) => {
+        setSelectedActivity(activity);
+        setActivityFile(null);
+        setActivityAdditionalInfoResponses({});
+        setActivityDialogOpen(true);
+    }
+
+    const handleActivityAdditionalInfoChange = (index: number, value: string) => {
+        setActivityAdditionalInfoResponses((prev) => ({ ...prev, [index]: value }));
+    };
+
+    const handleActivityAdditionalInfoToggle = (index: number, option: string, checked: boolean) => {
+        setActivityAdditionalInfoResponses((prev) => {
+            const current = Array.isArray(prev[index]) ? prev[index] : [];
+            const next = checked ? [...current, option] : current.filter((value) => value !== option);
+            return { ...prev, [index]: next };
+        });
+    };
+
+    const handleActivitySave = () => {
+        if (!selectedActivity) return;
+        if (selectedActivity.document_required && !activityFile) {
+            enqueueSnackbar("Se requiere subir un documento", { variant: "error" });
+            return;
+        }
+
+        const questions = selectedActivity.additional_info || [];
+        const answers: AdditionalInfoAnswerProps[] = [];
+        for (let index = 0; index < questions.length; index++) {
+            const question = questions[index];
+            const raw = activityAdditionalInfoResponses[index];
+            const answer = question.type === "multiple"
+                ? (Array.isArray(raw) ? raw : [])
+                : (typeof raw === "string" ? raw.trim() : "");
+            if (answer.length === 0) {
+                enqueueSnackbar(`Por favor responda la pregunta ${index + 1}`, { variant: "error" });
+                return;
+            }
+            answers.push({ question: question.question, type: question.type, answer });
+        }
+
+        registerActivity(selectedActivity._id, token, activityFile, answers).then((response) => {
             if (response.error) {
                 enqueueSnackbar(response.message, { variant: "error" });
                 return;
             }
             enqueueSnackbar(response.message, { variant: "success" });
+            setActivityDialogOpen(false);
+            setSelectedActivity(null);
+            setActivityAdditionalInfoResponses({});
+            setActivityFile(null);
             refreshUserInfo((oldValue) => oldValue + 1);
-            // reload data from server
 
         }).catch((error) => {
             enqueueSnackbar(`Error al registrar ${error}`, { variant: "error" });
@@ -86,7 +135,7 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
 
     return (
         <>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{"Elige las actividades que te interesan"}</Typography>
+            {data.length > 0 && <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{"Elige las actividades que te interesan"}</Typography>}
             {
                 data.map((activity: ActivityProps) => (
                     <Accordion
@@ -127,6 +176,12 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
                                     {dayjs(activity.date).format("DD/MM/YYYY")}
 
                                 </Typography>
+                                {(activity.registration_start || activity.registration_end) &&
+                                    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
+                                        {activity.registration_start && <Chip size="small" icon={<EventAvailableIcon />} label={`Inicio registro: ${dayjs(activity.registration_start).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
+                                        {activity.registration_end && <Chip size="small" icon={<EventBusyIcon />} label={`Fin registro: ${dayjs(activity.registration_end).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
+                                    </Stack>
+                                }
                             </Stack>
                             {session && registersNoRejected.length > 0 &&
                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: 'auto' }}>
@@ -196,12 +251,78 @@ function ActivityList({ params, registersNoRejected, registersActivityNoRejected
                                         <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                                             {activity.link && <Chip size="small" icon={<PublicIcon />} label={activity.link_text || ""} variant="filled" color="primary" onClick={() => window.open(activity.link, '_blank')} />}
                                         </Typography>
+                                        {registersActivityNoRejected.find((register) => register.activity === activity._id)?.additional_info?.length ? (
+                                            <Stack spacing={0.5}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>Tus respuestas</Typography>
+                                                {registersActivityNoRejected.find((register) => register.activity === activity._id)?.additional_info?.map((answer, index) => (
+                                                    <Typography key={index} variant="body2">
+                                                        {activity.additional_info?.[index]?.question && <><b>{activity.additional_info[index].question}:</b> </>}
+                                                        {Array.isArray(answer) ? answer.join(", ") : answer}
+                                                    </Typography>
+                                                ))}
+                                            </Stack>
+                                        ) : null}
                                     </Stack>
                                 </Box>
                             </Stack>
                         </AccordionDetails>
                     </Accordion>
                 ))}
+            <FullScreenDialog props={{
+                title: "",
+                open: activityDialogOpen,
+                closeFunction: () => setActivityDialogOpen(false),
+                saveFunction: handleActivitySave,
+                saveText: "Registrarse",
+            }}>
+                {selectedActivity && (
+                    <Container>
+                        <Typography variant="h5" sx={{ fontWeight: "medium" }}>Registro a {selectedActivity.title}</Typography>
+                        <Grid container spacing={3} sx={{ mt: 1 }}>
+                            {selectedActivity.document_required && (
+                                <Grid size={12}>
+                                    <Typography variant="h6" sx={{ fontWeight: "light" }}>Subir documento requerido</Typography>
+                                    <Button fullWidth color="secondary" variant="outlined" component="label" endIcon={<PhotoCamera />}>
+                                        Seleccionar archivo
+                                        <input hidden accept="image/avif,image/gif,image/jpeg,image/png,image/web,image/svg,image/svg+xml,application/pdf,application/msword"
+                                            type="file" onChange={(event) => setActivityFile(event.target.files?.[0] || null)} />
+                                    </Button>
+                                    <Typography>{activityFile?.name || "No se ha seleccionado ningún archivo"}</Typography>
+                                </Grid>
+                            )}
+                            {selectedActivity.additional_info?.map((question, index) => (
+                                <Grid size={12} key={`${index}-${question.question}`}>
+                                    <FormControl fullWidth>
+                                        <FormLabel sx={{ whiteSpace: "pre-line" }}><b>{index + 1}.</b> {question.question}</FormLabel>
+                                        {question.type === "multiple" ? (
+                                            <FormGroup>
+                                                {question.options.map((option) => (
+                                                    <FormControlLabel key={option} label={option}
+                                                        control={<Checkbox
+                                                            checked={Array.isArray(activityAdditionalInfoResponses[index]) && activityAdditionalInfoResponses[index].includes(option)}
+                                                            onChange={(event) => handleActivityAdditionalInfoToggle(index, option, event.target.checked)} />} />
+                                                ))}
+                                            </FormGroup>
+                                        ) : question.type === "single" ? (
+                                            <RadioGroup
+                                                value={typeof activityAdditionalInfoResponses[index] === "string" ? activityAdditionalInfoResponses[index] : ""}
+                                                onChange={(event) => handleActivityAdditionalInfoChange(index, event.target.value)}>
+                                                {question.options.map((option) => (
+                                                    <FormControlLabel key={option} value={option} label={option} control={<Radio />} />
+                                                ))}
+                                            </RadioGroup>
+                                        ) : (
+                                            <TextField fullWidth variant="outlined"
+                                                value={typeof activityAdditionalInfoResponses[index] === "string" ? activityAdditionalInfoResponses[index] : ""}
+                                                onChange={(event) => handleActivityAdditionalInfoChange(index, event.target.value)} />
+                                        )}
+                                    </FormControl>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Container>
+                )}
+            </FullScreenDialog>
         </>
     );
 }
@@ -212,7 +333,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const { data: session, status } = useSession();
     const [open, setOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState({ name: "" });
-    const [additionalInfoResponses, setAdditionalInfoResponses] = useState<string[]>([]);
+    const [additionalInfoResponses, setAdditionalInfoResponses] = useState<Record<number, string | string[]>>({});
     const eventLoadable = useRecoilValueLoadable(eventQuery(params.id));
     const registrationLoadable = useRecoilValueLoadable(eventRegisterQuery({ id: params.id }));
     const registrationActivityLoadable = useRecoilValueLoadable(activityRegisterQuery({ id: params.id }));
@@ -231,12 +352,14 @@ export default function Page({ params }: { params: { id: string } }) {
         }
         setSelectedFile(file);
     };
-    const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        const index = event.target.id;
+    const handleAdditionalInfoChange = (index: number, value: string) => {
+        setAdditionalInfoResponses((prev) => ({ ...prev, [index]: value }));
+    }
+    const handleAdditionalInfoToggle = (index: number, option: string, checked: boolean) => {
         setAdditionalInfoResponses((prev) => {
-            prev[parseInt(index)] = value;
-            return prev;
+            const current = Array.isArray(prev[index]) ? (prev[index] as string[]) : [];
+            const next = checked ? [...current, option] : current.filter((o) => o !== option);
+            return { ...prev, [index]: next };
         });
     }
     const handleSocialNetwork = (event: SelectChangeEvent) => {
@@ -247,25 +370,26 @@ export default function Page({ params }: { params: { id: string } }) {
             enqueueSnackbar("Se requiere subir un documento", { variant: "error" });
             return;
         }
-        if (event.additional_info && event.additional_info.length > 0) {
-            if (additionalInfoResponses.length !== event.additional_info.length) {
-                enqueueSnackbar("Se requiere completar las preguntas adicionales", { variant: "error" });
+        const questions = event.additional_info || [];
+        const answers: AdditionalInfoAnswerProps[] = [];
+        for (let index = 0; index < questions.length; index++) {
+            const q = questions[index];
+            const raw = additionalInfoResponses[index];
+            const answer = q.type === "multiple"
+                ? (Array.isArray(raw) ? raw : [])
+                : (typeof raw === "string" ? raw.trim() : "");
+            if (answer.length === 0) {
+                enqueueSnackbar(`Por favor responda la pregunta ${index + 1}`, { variant: "error" });
                 return;
             }
+            answers.push({ question: q.question, type: q.type, answer });
         }
         if (actualSocialNetwork === "") {
             enqueueSnackbar("Seleccione una red social", { variant: "error" });
             return;
         }
-        additionalInfoResponses.forEach((response, index) => {
-            const trimmed = response.trim();
-            if (trimmed === "") {
-                enqueueSnackbar(`Por favor ingrese un valor en la pregunta ${index + 1}`, { variant: "error" });
-                return;
-            }
-        });
         // save
-        registerEvent(params.id, token, selectedFile, additionalInfoResponses, actualSocialNetwork).then((response) => {
+        registerEvent(params.id, token, selectedFile, answers, actualSocialNetwork).then((response) => {
             if (response.error) {
                 enqueueSnackbar(response.message, { variant: "error" });
                 return;
@@ -345,6 +469,8 @@ export default function Page({ params }: { params: { id: string } }) {
                                 <Stack direction="row" spacing={1} useFlexGap
                                     sx={{ flexWrap: 'wrap' }}>
                                     <Chip size="small" icon={<AccessTimeFilledIcon />} label={dayjs(event.date).format("DD/MM/YYYY")} variant="outlined" />
+                                    {event.registration_start && <Chip size="small" icon={<EventAvailableIcon />} label={`Inicio registro: ${dayjs(event.registration_start).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
+                                    {event.registration_end && <Chip size="small" icon={<EventBusyIcon />} label={`Cierre registro: ${dayjs(event.registration_end).format("DD/MM/YYYY HH:mm")}`} variant="outlined" />}
                                     <Chip size="small" icon={<FaceIcon />} label={event.quota > 0 ? `Cupos: ${event.quota}` : `Cupos: Ilimitados`} color="primary" variant="outlined" />
                                     <Chip size="small" icon={<PaidIcon />} label={event.price ? `${event.price} ${event.currency}` : "Gratuito"} color="secondary" variant="outlined" />
                                     {!event.location_map ? <Chip size="small" icon={<LocationOnIcon />} label={event.location} variant="outlined" />
@@ -369,8 +495,8 @@ export default function Page({ params }: { params: { id: string } }) {
                                     event.additional_info && event.additional_info.length > 0 && (
                                         <Stack spacing={1}>
                                             <Alert severity="info" variant="outlined" >Preguntas adicionales</Alert>
-                                            {event.additional_info.map((info: string, index: number) => (
-                                                <Typography key={info} variant="overline" sx={{ whiteSpace: 'pre-line' }}><b>{index + 1}.</b> {info}</Typography>
+                                            {event.additional_info.map((info: AdditionalInfoQuestionProps, index: number) => (
+                                                <Typography key={`${index}-${info.question}`} variant="overline" sx={{ whiteSpace: 'pre-line' }}><b>{index + 1}.</b> {info.question}</Typography>
                                             ))
                                             }
                                         </Stack>
@@ -453,10 +579,32 @@ export default function Page({ params }: { params: { id: string } }) {
                                 <Typography variant="h6" sx={{ fontWeight: 'light' }} >Información adicional</Typography>
                             </Grid>
                         )}
-                        {event.additional_info && event.additional_info.map((info: string, index: number) => (
-                            <Grid size={12} key={info}>
-                                <Typography variant="overline" sx={{ whiteSpace: 'pre-line' }}><b>{index + 1}.</b> {info}</Typography>
-                                <TextField variant="outlined" fullWidth onChange={handleAdditionalInfoChange} id={index.toString()} />
+                        {event.additional_info && event.additional_info.map((info: AdditionalInfoQuestionProps, index: number) => (
+                            <Grid size={12} key={`${index}-${info.question}`}>
+                                <FormControl fullWidth>
+                                    <FormLabel sx={{ whiteSpace: 'pre-line' }}><b>{index + 1}.</b> {info.question}</FormLabel>
+                                    {info.type === "multiple" ? (
+                                        <FormGroup>
+                                            {info.options.map((option) => (
+                                                <FormControlLabel key={option} label={option}
+                                                    control={<Checkbox
+                                                        checked={Array.isArray(additionalInfoResponses[index]) && (additionalInfoResponses[index] as string[]).includes(option)}
+                                                        onChange={(e) => handleAdditionalInfoToggle(index, option, e.target.checked)} />} />
+                                            ))}
+                                        </FormGroup>
+                                    ) : info.type === "single" ? (
+                                        <RadioGroup value={typeof additionalInfoResponses[index] === "string" ? additionalInfoResponses[index] : ""}
+                                            onChange={(e) => handleAdditionalInfoChange(index, e.target.value)}>
+                                            {info.options.map((option) => (
+                                                <FormControlLabel key={option} value={option} label={option} control={<Radio />} />
+                                            ))}
+                                        </RadioGroup>
+                                    ) : (
+                                        <TextField variant="outlined" fullWidth
+                                            value={typeof additionalInfoResponses[index] === "string" ? additionalInfoResponses[index] : ""}
+                                            onChange={(e) => handleAdditionalInfoChange(index, e.target.value)} />
+                                    )}
+                                </FormControl>
                             </Grid>
                         ))}
                         {socialNetworks && (

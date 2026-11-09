@@ -96,7 +96,7 @@ export default function EventRegisterItem(props: { register: EventRegisterProps 
                         <Typography variant='body1'>
                             <Stack direction="row" spacing={1}>
                                 {props.register.additional_info?.map((info, index) => (
-                                    <Chip size="small" key={index} label={info} />
+                                    <Chip size="small" key={index} label={Array.isArray(info) ? info.join(", ") : info} />
                                 ))}
                             </Stack>
                         </Typography>

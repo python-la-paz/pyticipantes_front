@@ -48,6 +48,22 @@ export type ProfessionProps = {
     name: string;
 };
 
+export type AdditionalInfoType = "text" | "multiple" | "single";
+
+export type AdditionalInfoQuestionProps = {
+    question: string;
+    type: AdditionalInfoType;
+    options: string[];
+};
+
+export type AdditionalInfoAnswerProps = {
+    question: string;
+    type: AdditionalInfoType;
+    answer: string | string[];
+};
+
+export type AdditionalInfoValueProps = string | string[];
+
 export type EventProps = {
     title: string;
     description: string;
@@ -66,9 +82,11 @@ export type EventProps = {
     finished?: boolean;
     tags: string[];
     organizers: string[];
-    additional_info: string[];
+    additional_info: AdditionalInfoQuestionProps[];
     document_required?: boolean;
     automatic?: boolean;
+    registration_start?: Date | null;
+    registration_end?: Date | null;
     _id: string;
 };
 
@@ -82,7 +100,7 @@ export type EventRegisterProps = {
     status?: string;
     note?: string;
     document_upload: FileBlobProps | null;
-    additional_info?: string[];
+    additional_info?: AdditionalInfoValueProps[];
     _id: string;
 };
 
@@ -127,9 +145,11 @@ export type ActivityProps = {
     finished?: boolean;
     tags?: string[];
     organizers?: string[];
-    additional_info?: string[];
+    additional_info?: AdditionalInfoQuestionProps[];
     document_required?: boolean;
     automatic?: boolean;
+    registration_start?: Date | null;
+    registration_end?: Date | null;
     is_full: boolean;
     _id: string;
 }
@@ -142,6 +162,6 @@ export type ActivityRegisterProps = {
     status?: string;
     note?: string;
     document_upload?: FileBlobProps;
-    additional_info?: string[];
+    additional_info?: AdditionalInfoValueProps[];
     _id: string;
 }
