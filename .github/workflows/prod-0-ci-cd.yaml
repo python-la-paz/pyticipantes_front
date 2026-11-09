@@ -17,6 +17,7 @@ jobs:
       environment: prod
       image_repository: ${{ vars.DOCKER_IMAGE }}
       push_image: ${{ github.event_name == 'push' }}
+      next_public_api_url: ${{ vars.NEXT_PUBLIC_API_URL }}
     secrets:
       docker_hub_username: ${{ secrets.DOCKER_HUB_USERNAME }}
       docker_hub_access_token: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
