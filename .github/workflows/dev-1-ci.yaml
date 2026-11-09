@@ -16,10 +16,6 @@ on:
         required: false
         default: false
         type: boolean
-      next_public_api_url:
-        description: NEXT_PUBLIC_API_URL environment variable
-        required: true
-        type: string
     secrets:
       docker_hub_username:
         required: false
@@ -63,6 +59,15 @@ jobs:
           username: ${{ secrets.docker_hub_username }}
           password: ${{ secrets.docker_hub_access_token }}
 
+      - name: Validate API URL
+        env:
+          API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then
+            echo "::error::NEXT_PUBLIC_API_URL is empty. Check GitHub Environment variables."
+            exit 1
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -73,6 +78,6 @@ jobs:
             ${{ inputs.image_repository }}:${{ steps.image.outputs.tag }}
             ${{ inputs.image_repository }}:dev-latest
           build-args: |
-            NEXT_PUBLIC_API_URL_ARG=${{ inputs.next_public_api_url }}
+            NEXT_PUBLIC_API_URL_ARG=${{ vars.NEXT_PUBLIC_API_URL }}
           cache-from: type=gha,scope=dev
           cache-to: type=gha,mode=max,scope=dev
