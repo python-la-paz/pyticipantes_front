@@ -73,6 +73,6 @@ jobs:
             ${{ inputs.image_repository }}:${{ steps.image.outputs.tag }}
             ${{ inputs.image_repository }}:dev-latest
           build-args: |
-            NEXT_PUBLIC_API_URL_ARG=${{env.NEXT_PUBLIC_API_URL}}
+            NEXT_PUBLIC_API_URL_ARG=${{ inputs.next_public_api_url }}
           cache-from: type=gha,scope=dev
           cache-to: type=gha,mode=max,scope=dev
