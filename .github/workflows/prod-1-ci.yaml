@@ -16,6 +16,10 @@ on:
         required: false
         default: false
         type: boolean
+      next_public_api_url:
+        description: NEXT_PUBLIC_API_URL environment variable
+        required: true
+        type: string
     secrets:
       docker_hub_username:
         required: false
@@ -69,6 +73,6 @@ jobs:
             ${{ inputs.image_repository }}:${{ steps.image.outputs.tag }}
             ${{ inputs.image_repository }}:latest
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_API_URL=${{ inputs.next_public_api_url }}
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
