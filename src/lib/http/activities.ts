@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
 import { URLS } from "./urls";
-import { ActivityProps, ActivityRegisterProps} from "@/const";
+import { ActivityProps, ActivityRegisterProps, AdditionalInfoAnswerProps } from "@/const";
 
 export async function fetchActivities(
     id: string,
@@ -59,7 +59,7 @@ export async function registerActivity(
     id: string,
     access_token: string,
     file: any,
-    additionalInfo: string[],
+    additionalInfo: AdditionalInfoAnswerProps[],
 ): Promise<{
     content: ActivityRegisterProps;
     error?: any;
@@ -73,7 +73,7 @@ export async function registerActivity(
             formData.append("file", file, file.name);
         if (additionalInfo.length > 0) {
             additionalInfo.forEach((info) => {
-                formData.append("additional_info", info);
+                formData.append("additional_info", JSON.stringify(info));
             });
         } else {
             formData.append("additional_info", "");
